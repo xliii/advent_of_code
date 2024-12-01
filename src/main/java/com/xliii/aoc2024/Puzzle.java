@@ -6,16 +6,23 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
 
-public class Puzzle {
+public abstract class Puzzle {
 
     protected List<String> getInput() {
         try {
-            String filename = getClass().getSimpleName().toLowerCase() + ".txt";
-            File file = readFile(filename);
+            File file = readFile(inputFilename());
             return Files.readAllLines(file.toPath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String inputFilename() {
+        String day = getClass().getSimpleName().toLowerCase();
+        String suffix = useExample() ? "_example" : "";
+        String extension = ".txt";
+
+        return day + suffix + extension;
     }
 
     private File readFile(String filename) {
@@ -25,4 +32,6 @@ public class Puzzle {
         }
         return new File(resource.getPath());
     }
+
+    protected abstract boolean useExample();
 }

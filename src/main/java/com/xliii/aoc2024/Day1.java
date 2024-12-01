@@ -4,6 +4,11 @@ import java.util.*;
 
 public class Day1 extends Puzzle {
 
+    @Override
+    protected boolean useExample() {
+        return true;
+    }
+
     public static void main(String[] args) {
         Day1 day1 = new Day1();
         List<String[]> zippedList = day1.getInput().stream()
