@@ -8,6 +8,8 @@ import java.util.List;
 
 public abstract class Puzzle {
 
+    //TODO: Logger with controlled indentation for recursion
+
     protected List<String> getInput() {
         try {
             File file = readFile(inputFilename());
