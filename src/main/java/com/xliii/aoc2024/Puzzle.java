@@ -9,6 +9,7 @@ import java.util.List;
 public abstract class Puzzle {
 
     //TODO: Logger with controlled indentation for recursion
+    //.error() .success() color coding
 
     protected List<String> getInput() {
         try {
