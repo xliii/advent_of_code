@@ -36,22 +36,21 @@ public class Day2 extends Puzzle {
     }
 
     private boolean safeWithToleration(List<Integer> report) {
-        System.out.println();
+        log.info();
         return safeWithToleration(report, 0);
     }
 
-    private List<Integer> removeAt(List<Integer> report, int index) {
+    private List<Integer> removeAt(List<Integer> report, int index, int indentation) {
         ArrayList<Integer> updated = new ArrayList<>(report);
         updated.remove(index);
-        log.info(report + " > " + updated);
+        log.info(report + " > " + updated, indentation);
         return updated;
     }
 
     private boolean safeWithToleration(List<Integer> report, int errors) {
-        //TODO: Handle case where initial rising was incorrect
-        log.info("Processing " + report + (errors > 0 ? " with toleration" : ""));
+        log.info("Processing " + report + (errors > 0 ? " with toleration" : ""), errors);
         if (errors > 1) {
-            log.error("Unsafe: " + report + " - too deep: " + errors);
+            log.error("Unsafe: " + report + " - too deep: " + errors, errors);
             return false;
         }
         Integer last = null;
@@ -67,37 +66,38 @@ public class Day2 extends Puzzle {
             int diff = entry - last;
             last = entry;
             if (diff == 0 || Math.abs(diff) > 3) {
-                boolean result1 = safeWithToleration(removeAt(report, i - 1), errors + 1);
-                boolean result2 = safeWithToleration(removeAt(report, i), errors + 1);
-                if (result1 || result2) {
-                    log.success("Safe with toleration: " + report);
+                boolean result = safeWithToleration(removeAt(report, i - 1, errors), errors + 1) ||
+                        safeWithToleration(removeAt(report, i, errors), errors + 1);
+                if (result) {
+                    log.success("Safe with toleration: " + report, errors);
                 } else {
-                    log.error("Unsafe: " + report);
+                    log.error("Unsafe: " + report, errors);
                 }
 
-                return result1 || result2;
+                return result;
             }
 
             if (rising == null) {
                 rising = diff > 0;
             } else if (rising != (diff > 0)) {
-                boolean result0 = safeWithToleration(removeAt(report, 0), errors + 1);
-                boolean result1 = safeWithToleration(removeAt(report, i - 1), errors + 1);
-                boolean result2 = safeWithToleration(removeAt(report, i), errors + 1);
-                if (result0 || result1 || result2) {
-                    log.success("Safe with toleration: " + report);
+                //Additionally handle first element for corner cases when direction was wrong at the start
+                boolean result = safeWithToleration(removeAt(report, 0, errors), errors + 1) ||
+                        safeWithToleration(removeAt(report, i - 1, errors), errors + 1) ||
+                        safeWithToleration(removeAt(report, i, errors), errors + 1);
+                if (result) {
+                    log.success("Safe with toleration: " + report, errors);
                 } else {
-                    log.error("Unsafe: " + report);
+                    log.error("Unsafe: " + report, errors);
                 }
 
-                return result0 || result1 || result2;
+                return result;
             }
         }
 
         if (errors > 0) {
-            log.success("Safe with toleration: " + report);
+            log.success("Safe with toleration: " + report, errors);
         } else {
-            log.error("Safe: " + report);
+            log.error("Safe: " + report, errors);
         }
 
         return true;
