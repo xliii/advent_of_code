@@ -1,5 +1,6 @@
 package com.xliii.aoc2024;
 
+@SuppressWarnings("unused")
 public class Logger {
 
     private static final String ANSI_RESET = "\u001B[0m";
