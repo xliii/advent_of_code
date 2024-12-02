@@ -36,6 +36,7 @@ public class Day2 extends Puzzle {
     }
 
     private static boolean safeWithToleration(List<Integer> report) {
+        System.out.println();
         return safeWithToleration(report, 0);
     }
 
@@ -47,6 +48,8 @@ public class Day2 extends Puzzle {
     }
 
     private static boolean safeWithToleration(List<Integer> report, int errors) {
+        //TODO: Handle case where initial rising was incorrect
+
         System.out.println("  ".repeat(errors) + "Processing " + report + (errors > 0 ? " with toleration" : ""));
         if (errors > 1) {
             System.out.println("  ".repeat(errors) + "Unsafe: " + report + " - too deep: " + errors);
@@ -79,15 +82,16 @@ public class Day2 extends Puzzle {
             if (rising == null) {
                 rising = diff > 0;
             } else if (rising != (diff > 0)) {
+                boolean result0 = safeWithToleration(removeAt(report, 0, errors), errors + 1);
                 boolean result1 = safeWithToleration(removeAt(report, i - 1, errors), errors + 1);
                 boolean result2 = safeWithToleration(removeAt(report, i, errors), errors + 1);
-                if (result1 || result2) {
+                if (result0 || result1 || result2) {
                     System.out.println("  ".repeat(errors) + "Safe with toleration: " + report);
                 } else {
                     System.out.println("  ".repeat(errors) + "Unsafe: " + report);
                 }
 
-                return result1 || result2;
+                return result0 || result1 || result2;
             }
         }
 
