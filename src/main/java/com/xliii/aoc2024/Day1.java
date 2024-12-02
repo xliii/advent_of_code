@@ -9,9 +9,9 @@ public class Day1 extends Puzzle {
         return true;
     }
 
-    public static void main(String[] args) {
-        Day1 day1 = new Day1();
-        List<String[]> zippedList = day1.getInput().stream()
+    @Override
+    protected void run() {
+        List<String[]> zippedList = getInput().stream()
                 .map(entry -> entry.split("\\s+"))
                 .toList();
 
@@ -22,24 +22,24 @@ public class Day1 extends Puzzle {
             second.add(Integer.valueOf(line[1]));
         }
 
-        System.out.println(first);
-        System.out.println(second);
+        log.info(first);
+        log.info(second);
 
         first.sort(Comparator.naturalOrder());
         second.sort(Comparator.naturalOrder());
 
-        System.out.println(first);
-        System.out.println(second);
+        log.info(first);
+        log.info(second);
 
         int sum = 0;
 
         for (int i = 0; i < first.size(); i++) {
             int diff = Math.abs(first.get(i) - second.get(i));
-            System.out.println(diff);
+            log.info(diff);
             sum += diff;
         }
 
-        System.out.println("result: " + sum);
+        log.success("result: " + sum);
 
         Map<Integer, Integer> frequencyMap = new HashMap<>();
 
@@ -47,7 +47,7 @@ public class Day1 extends Puzzle {
             frequencyMap.put(number, frequencyMap.getOrDefault(number, 0) + 1);
         }
 
-        System.out.println(frequencyMap);
+        log.info(frequencyMap);
 
         int similarity = 0;
 
@@ -55,7 +55,12 @@ public class Day1 extends Puzzle {
             similarity += frequencyMap.getOrDefault(number, 0) * number;
         }
 
-        System.out.println(similarity);
+        log.success(similarity);
+    }
+
+    public static void main(String[] args) {
+        Day1 day1 = new Day1();
+        day1.run();
     }
 
 }

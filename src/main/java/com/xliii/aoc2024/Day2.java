@@ -9,7 +9,7 @@ public class Day2 extends Puzzle {
         return false;
     }
 
-    private static boolean safe(List<Integer> report) {
+    private boolean safe(List<Integer> report) {
         Integer last = null;
         Boolean rising = null;
         for (Integer entry : report) {
@@ -35,24 +35,23 @@ public class Day2 extends Puzzle {
         return true;
     }
 
-    private static boolean safeWithToleration(List<Integer> report) {
+    private boolean safeWithToleration(List<Integer> report) {
         System.out.println();
         return safeWithToleration(report, 0);
     }
 
-    private static List<Integer> removeAt(List<Integer> report, int index, int errors) {
+    private List<Integer> removeAt(List<Integer> report, int index) {
         ArrayList<Integer> updated = new ArrayList<>(report);
         updated.remove(index);
-        System.out.println("  ".repeat(errors) + report + " > " + updated);
+        log.info(report + " > " + updated);
         return updated;
     }
 
-    private static boolean safeWithToleration(List<Integer> report, int errors) {
+    private boolean safeWithToleration(List<Integer> report, int errors) {
         //TODO: Handle case where initial rising was incorrect
-
-        System.out.println("  ".repeat(errors) + "Processing " + report + (errors > 0 ? " with toleration" : ""));
+        log.info("Processing " + report + (errors > 0 ? " with toleration" : ""));
         if (errors > 1) {
-            System.out.println("  ".repeat(errors) + "Unsafe: " + report + " - too deep: " + errors);
+            log.error("Unsafe: " + report + " - too deep: " + errors);
             return false;
         }
         Integer last = null;
@@ -68,12 +67,12 @@ public class Day2 extends Puzzle {
             int diff = entry - last;
             last = entry;
             if (diff == 0 || Math.abs(diff) > 3) {
-                boolean result1 = safeWithToleration(removeAt(report, i - 1, errors), errors + 1);
-                boolean result2 = safeWithToleration(removeAt(report, i, errors), errors + 1);
+                boolean result1 = safeWithToleration(removeAt(report, i - 1), errors + 1);
+                boolean result2 = safeWithToleration(removeAt(report, i), errors + 1);
                 if (result1 || result2) {
-                    System.out.println("  ".repeat(errors) + "Safe with toleration: " + report);
+                    log.success("Safe with toleration: " + report);
                 } else {
-                    System.out.println("  ".repeat(errors) + "Unsafe: " + report);
+                    log.error("Unsafe: " + report);
                 }
 
                 return result1 || result2;
@@ -82,13 +81,13 @@ public class Day2 extends Puzzle {
             if (rising == null) {
                 rising = diff > 0;
             } else if (rising != (diff > 0)) {
-                boolean result0 = safeWithToleration(removeAt(report, 0, errors), errors + 1);
-                boolean result1 = safeWithToleration(removeAt(report, i - 1, errors), errors + 1);
-                boolean result2 = safeWithToleration(removeAt(report, i, errors), errors + 1);
+                boolean result0 = safeWithToleration(removeAt(report, 0), errors + 1);
+                boolean result1 = safeWithToleration(removeAt(report, i - 1), errors + 1);
+                boolean result2 = safeWithToleration(removeAt(report, i), errors + 1);
                 if (result0 || result1 || result2) {
-                    System.out.println("  ".repeat(errors) + "Safe with toleration: " + report);
+                    log.success("Safe with toleration: " + report);
                 } else {
-                    System.out.println("  ".repeat(errors) + "Unsafe: " + report);
+                    log.error("Unsafe: " + report);
                 }
 
                 return result0 || result1 || result2;
@@ -96,34 +95,45 @@ public class Day2 extends Puzzle {
         }
 
         if (errors > 0) {
-            System.out.println("  ".repeat(errors) + "Safe with toleration: " + report);
+            log.success("Safe with toleration: " + report);
         } else {
-            System.out.println("  ".repeat(errors) + "Safe: " + report);
+            log.error("Safe: " + report);
         }
 
         return true;
     }
 
-    public static void main(String[] args) {
-        Day2 day2 = new Day2();
-        long safeReportsTotal = day2.getInput().stream()
+    public void processSafe() {
+        long safeReportsTotal = getInput().stream()
                 .map(entry -> List.of(entry.split("\\s+")))
                 .map(entry -> entry.stream().map(Integer::valueOf).toList())
-                .map(Day2::safe)
+                .map(this::safe)
                 .filter(Boolean::booleanValue)
                 .count();
 
-        System.out.println(safeReportsTotal);
-
-        long safeReportsWithTolerationTotal = day2.getInput().stream()
-                .map(entry -> List.of(entry.split("\\s+")))
-                .map(entry -> entry.stream().map(Integer::valueOf).toList())
-                .map(Day2::safeWithToleration)
-                .filter(Boolean::booleanValue)
-                .count();
-
-
-        System.out.println(safeReportsWithTolerationTotal);
+        log.info(safeReportsTotal);
     }
 
+    private void processSafeWithToleration() {
+        long safeReportsWithTolerationTotal = getInput().stream()
+                .map(entry -> List.of(entry.split("\\s+")))
+                .map(entry -> entry.stream().map(Integer::valueOf).toList())
+                .map(this::safeWithToleration)
+                .filter(Boolean::booleanValue)
+                .count();
+
+
+        log.info(safeReportsWithTolerationTotal);
+    }
+
+    @Override
+    protected void run() {
+        processSafe();
+        processSafeWithToleration();
+    }
+
+    public static void main(String[] args) {
+        Day2 day2 = new Day2();
+        day2.run();
+    }
 }

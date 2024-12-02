@@ -8,10 +8,9 @@ import java.util.List;
 
 public abstract class Puzzle {
 
-    //TODO: Logger with controlled indentation for recursion
-    //.error() .success() color coding
+    public Logger log = new Logger();
 
-    protected List<String> getInput() {
+    public List<String> getInput() {
         try {
             File file = readFile(inputFilename());
             return Files.readAllLines(file.toPath());
@@ -35,6 +34,8 @@ public abstract class Puzzle {
         }
         return new File(resource.getPath());
     }
+
+    protected abstract void run();
 
     protected abstract boolean useExample();
 }
