@@ -17,6 +17,56 @@ public class Day4 extends Puzzle {
 
     @Override
     protected void run() {
+        solve2();
+    }
+
+    private boolean isXMAS(char[][] grid, int x, int y) {
+        int N = grid.length;
+        int M = grid[0].length;
+        if (x == 0 || y == 0 || x == N - 1 || y == M - 1) {
+            return false;
+        }
+
+        char nw = grid[x-1][y-1];
+        char ne = grid[x+1][y-1];
+        char sw = grid[x-1][y+1];
+        char se = grid[x+1][y+1];
+
+        return
+            isMMSS(nw, ne, sw, se) ||
+            isMMSS(nw, sw, ne, se) ||
+            isMMSS(sw, se, nw, ne) ||
+            isMMSS(ne, se, nw, sw);
+    }
+
+    private boolean isMMSS(char a, char b, char c, char d) {
+        return a == 'M' && b == 'M' && c == 'S' && d == 'S';
+    }
+
+    private void solve2() {
+        char[][] grid = getInput().stream().map(String::toCharArray).toArray(char[][]::new);
+        int N = grid.length;
+        int M = grid[0].length;
+
+        int total = 0;
+        for (int x = 0; x < N; x++) {
+            for (int y = 0; y < M; y++) {
+                char current = grid[x][y];
+                if (current != 'A') {
+                    continue;
+                }
+
+                if (isXMAS(grid, x, y)) {
+                    total++;
+                }
+
+            }
+        }
+
+        log.success(total);
+    }
+
+    private void solve1() {
         List<String> input = getInput();
         List<String> transposed = transpose(input);
         int total = 0;
