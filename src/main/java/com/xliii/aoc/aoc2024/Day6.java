@@ -15,7 +15,7 @@ public class Day6 extends Puzzle {
     }
 
     private void solve1() {
-
+        System.out.println(getInput());
     }
 
     public static void main(String[] args) {
