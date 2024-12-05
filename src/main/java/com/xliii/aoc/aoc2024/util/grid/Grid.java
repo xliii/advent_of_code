@@ -1,4 +1,6 @@
-package com.xliii.aoc.aoc2024.util;
+package com.xliii.aoc.aoc2024.util.grid;
+
+import com.xliii.aoc.aoc2024.util.Direction;
 
 import java.text.MessageFormat;
 import java.util.Iterator;

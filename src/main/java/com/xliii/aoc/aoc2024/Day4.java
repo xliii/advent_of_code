@@ -1,9 +1,9 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
-import com.xliii.aoc.aoc2024.util.Cell;
+import com.xliii.aoc.aoc2024.util.grid.Cell;
 import com.xliii.aoc.aoc2024.util.Direction;
-import com.xliii.aoc.aoc2024.util.Grid;
+import com.xliii.aoc.aoc2024.util.grid.Grid;
 
 import java.util.ArrayList;
 import java.util.Arrays;
