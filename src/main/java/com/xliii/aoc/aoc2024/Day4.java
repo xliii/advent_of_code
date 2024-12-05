@@ -1,6 +1,7 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
+import com.xliii.aoc.aoc2024.util.Cell;
 import com.xliii.aoc.aoc2024.util.Direction;
 import com.xliii.aoc.aoc2024.util.Grid;
 
@@ -49,17 +50,13 @@ public class Day4 extends Puzzle {
 
         int total = 0;
 
-        for (int x = 0; x < grid.getWidth(); x++) {
-            for (int y = 0; y < grid.getHeight(); y++) {
-                char current = grid.get(x, y);
-                if (current != 'A') {
-                    continue;
-                }
+        for (Cell<Character> cell : grid) {
+            if (cell.value() != 'A') {
+                continue;
+            }
 
-                if (isXMAS(grid, x, y)) {
-                    total++;
-                }
-
+            if (isXMAS(grid, cell.x(), cell.y())) {
+                total++;
             }
         }
 

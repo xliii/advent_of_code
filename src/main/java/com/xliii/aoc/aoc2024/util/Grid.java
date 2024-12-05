@@ -1,10 +1,11 @@
 package com.xliii.aoc.aoc2024.util;
 
 import java.text.MessageFormat;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Grid<T> {
+public class Grid<T> implements Iterable<Cell<T>> {
 
     public final T[][] data;
 
@@ -91,5 +92,26 @@ public class Grid<T> {
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    @Override
+    public Iterator<Cell<T>> iterator() {
+        return new Iterator<>() {
+            private int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return index < width * height;
+            }
+
+            @Override
+            public Cell<T> next() {
+                int x = index % width;
+                int y = index / width;
+                T value = get(x, y);
+                index++;
+                return new Cell<>(x, y, value);
+            }
+        };
     }
 }
