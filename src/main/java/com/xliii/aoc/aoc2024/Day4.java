@@ -1,6 +1,7 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
+import com.xliii.aoc.aoc2024.util.Grid;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,20 +20,17 @@ public class Day4 extends Puzzle {
 
     @Override
     protected void run() {
+        //solve1();
         solve2();
     }
 
-    private boolean isXMAS(char[][] grid, int x, int y) {
-        int N = grid.length;
-        int M = grid[0].length;
-        if (x == 0 || y == 0 || x == N - 1 || y == M - 1) {
-            return false;
-        }
+    private boolean isXMAS(Grid<Character> grid, int x, int y) {
+        if (grid.outOfBounds(x, y) || grid.isEdge(x, y)) return false;
 
-        char nw = grid[x-1][y-1];
-        char ne = grid[x+1][y-1];
-        char sw = grid[x-1][y+1];
-        char se = grid[x+1][y+1];
+        char nw = grid.get(x - 1, y - 1);
+        char ne = grid.get(x + 1, y - 1);
+        char sw = grid.get(x - 1, y + 1);
+        char se = grid.get(x + 1, y + 1);
 
         return
             isMMSS(nw, ne, sw, se) ||
@@ -46,14 +44,13 @@ public class Day4 extends Puzzle {
     }
 
     private void solve2() {
-        char[][] grid = getInput().stream().map(String::toCharArray).toArray(char[][]::new);
-        int N = grid.length;
-        int M = grid[0].length;
+        Grid<Character> grid = Grid.create(getInput());
 
         int total = 0;
-        for (int x = 0; x < N; x++) {
-            for (int y = 0; y < M; y++) {
-                char current = grid[x][y];
+
+        for (int x = 0; x < grid.getWidth(); x++) {
+            for (int y = 0; y < grid.getHeight(); y++) {
+                char current = grid.get(x, y);
                 if (current != 'A') {
                     continue;
                 }
