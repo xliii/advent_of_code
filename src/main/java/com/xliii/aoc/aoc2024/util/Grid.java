@@ -25,6 +25,12 @@ public class Grid<T> {
         return data[y][x];
     }
 
+    public T neighbor(int x, int y, Direction direction) {
+        int nx = x + direction.getX();
+        int ny = y + direction.getY();
+        return get(nx, ny);
+    }
+
     public boolean isEdge(int x, int y) {
         return (x == 0 || x == width - 1) || (y == 0 || y == height - 1);
     }

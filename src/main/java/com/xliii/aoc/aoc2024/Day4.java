@@ -1,6 +1,7 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
+import com.xliii.aoc.aoc2024.util.Direction;
 import com.xliii.aoc.aoc2024.util.Grid;
 
 import java.util.ArrayList;
@@ -27,10 +28,10 @@ public class Day4 extends Puzzle {
     private boolean isXMAS(Grid<Character> grid, int x, int y) {
         if (grid.outOfBounds(x, y) || grid.isEdge(x, y)) return false;
 
-        char nw = grid.get(x - 1, y - 1);
-        char ne = grid.get(x + 1, y - 1);
-        char sw = grid.get(x - 1, y + 1);
-        char se = grid.get(x + 1, y + 1);
+        char nw = grid.neighbor(x, y, Direction.NORTH_WEST);
+        char se = grid.neighbor(x, y, Direction.SOUTH_EAST);
+        char sw = grid.neighbor(x, y, Direction.SOUTH_WEST);
+        char ne = grid.neighbor(x, y, Direction.NORTH_EAST);
 
         return
             isMMSS(nw, ne, sw, se) ||
