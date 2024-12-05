@@ -1,6 +1,7 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
+import com.xliii.aoc.aoc2024.util.Sets;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -80,7 +81,7 @@ public class Day5 extends Puzzle {
                 continue;
             }
 
-            Set<Integer> intersection = intersection(used, rules.get(value));
+            Set<Integer> intersection = Sets.intersection(used, rules.get(value));
             if (!intersection.isEmpty()) {
                 log.error(value + " should go before " + intersection);
                 return false;
@@ -89,10 +90,6 @@ public class Day5 extends Puzzle {
             used.add(value);
         }
         return true;
-    }
-
-    private <T> Set<T> intersection(Set<T> a, Set<T> b) {
-        return a.stream().filter(b::contains).collect(Collectors.toSet());
     }
 
     public static void main(String[] args) {
