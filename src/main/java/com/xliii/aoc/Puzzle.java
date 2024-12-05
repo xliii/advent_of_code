@@ -1,4 +1,4 @@
-package com.xliii.aoc2024;
+package com.xliii.aoc;
 
 import java.io.File;
 import java.io.IOException;

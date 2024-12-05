@@ -1,4 +1,4 @@
-package com.xliii.aoc2024;
+package com.xliii.aoc;
 
 @SuppressWarnings("unused")
 public class Logger {

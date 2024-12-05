@@ -1,4 +1,6 @@
-package com.xliii.aoc2024;
+package com.xliii.aoc.aoc2024;
+
+import com.xliii.aoc.Puzzle;
 
 import java.util.*;
 import java.util.stream.Collectors;
