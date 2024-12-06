@@ -3,6 +3,7 @@ package com.xliii.aoc.aoc2024.util.grid;
 import com.xliii.aoc.aoc2024.util.Direction;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -28,6 +29,14 @@ public class Grid<T> implements Iterable<Cell<T>> {
             }
         }
         return total;
+    }
+
+    public Grid<T> copy() {
+        @SuppressWarnings("unchecked")
+        T[][] dataCopy = (T[][]) Arrays.stream(data)
+            .map(row -> row.clone())
+            .toArray(Object[][]::new);
+        return create(dataCopy);
     }
 
     public T put(int x, int y, T value) {

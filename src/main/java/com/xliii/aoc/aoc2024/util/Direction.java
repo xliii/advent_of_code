@@ -16,7 +16,7 @@ public enum Direction {
 
     SOUTH_WEST(-1,1, ' '),
 
-    WEST(-1,0, '>'),
+    WEST(-1,0, '<'),
 
     NORTH_WEST(-1,-1, ' ');
 
