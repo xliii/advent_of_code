@@ -46,20 +46,29 @@ public enum Direction {
         return sign;
     }
 
+    public Direction rotate45(boolean clockwise) {
+        int diff = clockwise ? 1 : -1;
+        int index = ALL.indexOf(this);
+        return ALL.get((ALL.size() + index + diff) % ALL.size());
+    }
+
     public Direction rotate45() {
-        //TODO: Implement
-        throw new RuntimeException("Not implemented");
+        return rotate45(true);
+    }
+
+    public Direction rotate90(boolean clockwise) {
+        int diff = clockwise ? 1 : -1;
+        if (ORTHOGONAL.contains(this)) {
+            int index = ORTHOGONAL.indexOf(this);
+            return ORTHOGONAL.get((ORTHOGONAL.size() + index + diff) % ORTHOGONAL.size());
+        } else {
+            int index = DIAGONAL.indexOf(this);
+            return DIAGONAL.get((DIAGONAL.size() + index + diff) % DIAGONAL.size());
+        }
     }
 
     public Direction rotate90() {
-        //TODO: Implement CCW
-        if (ORTHOGONAL.contains(this)) {
-            int index = ORTHOGONAL.indexOf(this);
-            return ORTHOGONAL.get((index + 1) % ORTHOGONAL.size());
-        } else {
-            int index = DIAGONAL.indexOf(this);
-            return DIAGONAL.get((index + 1) % DIAGONAL.size());
-        }
+        return rotate90(true);
     }
 
     public static boolean isDirection(char sign) {
