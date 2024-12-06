@@ -1,5 +1,7 @@
 package com.xliii.aoc;
 
+import com.xliii.aoc.aoc2024.util.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;

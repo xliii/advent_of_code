@@ -1,11 +1,10 @@
 package com.xliii.aoc.aoc2024.util.grid;
 
+import com.xliii.aoc.aoc2024.util.Color;
 import com.xliii.aoc.aoc2024.util.Direction;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class Grid<T> implements Iterable<Cell<T>> {
@@ -14,11 +13,13 @@ public class Grid<T> implements Iterable<Cell<T>> {
 
     private final int width;
     private final int height;
+    private final Map<T, Color> colorMap;
 
-    private Grid(T[][] data) {
+    private Grid(T[][] data, Map<T, Color> colorMap) {
         this.data = data;
         this.width = data.length;
         this.height = data[0].length;
+        this.colorMap = colorMap;
     }
 
     public int count(T value) {
@@ -36,7 +37,7 @@ public class Grid<T> implements Iterable<Cell<T>> {
         T[][] dataCopy = (T[][]) Arrays.stream(data)
             .map(row -> row.clone())
             .toArray(Object[][]::new);
-        return create(dataCopy);
+        return create(dataCopy, colorMap);
     }
 
     public T put(int x, int y, T value) {
@@ -90,14 +91,18 @@ public class Grid<T> implements Iterable<Cell<T>> {
     }
 
     public static Grid<Character> create(List<String> data) {
+        return create(data, new HashMap<>());
+    }
+
+    public static Grid<Character> create(List<String> data, Map<Character, Color> colorMap) {
         Character[][] grid = data.stream()
                 .map(
                     s -> s.chars().mapToObj(c -> (char) c).toArray(Character[]::new)
                 ).toArray(Character[][]::new);
-        return Grid.create(grid);
+        return Grid.create(grid, colorMap);
     }
 
-    public static <T> Grid<T> create(T[][] data) {
+    public static <T> Grid<T> create(T[][] data, Map<T, Color> colorMap) {
         if (data.length == 0) {
             throw new GridException("Grid height cannot be 0");
         }
@@ -112,7 +117,7 @@ public class Grid<T> implements Iterable<Cell<T>> {
             throw new GridException("Grid width cannot be 0");
         }
 
-        return new Grid<>(data);
+        return new Grid<>(data, colorMap);
     }
 
     public int getWidth() {
@@ -128,7 +133,13 @@ public class Grid<T> implements Iterable<Cell<T>> {
         StringBuilder sb = new StringBuilder();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                sb.append(data[y][x]);
+                T value = data[y][x];
+                if (colorMap.containsKey(value)) {
+                    sb.append(colorMap.get(value).text(value));
+                } else {
+                    sb.append(value);
+                }
+
             }
             sb.append("\n");
         }
