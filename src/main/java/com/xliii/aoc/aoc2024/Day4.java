@@ -29,10 +29,10 @@ public class Day4 extends Puzzle {
     private boolean isXMAS(Grid<Character> grid, int x, int y) {
         if (grid.outOfBounds(x, y) || grid.isEdge(x, y)) return false;
 
-        char nw = grid.neighbor(x, y, Direction.NORTH_WEST);
-        char se = grid.neighbor(x, y, Direction.SOUTH_EAST);
-        char sw = grid.neighbor(x, y, Direction.SOUTH_WEST);
-        char ne = grid.neighbor(x, y, Direction.NORTH_EAST);
+        char nw = grid.neighbor(x, y, Direction.NORTH_WEST).value();
+        char se = grid.neighbor(x, y, Direction.SOUTH_EAST).value();
+        char sw = grid.neighbor(x, y, Direction.SOUTH_WEST).value();
+        char ne = grid.neighbor(x, y, Direction.NORTH_EAST).value();
 
         return
             isMMSS(nw, ne, sw, se) ||

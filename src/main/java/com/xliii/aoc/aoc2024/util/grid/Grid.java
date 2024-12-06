@@ -20,6 +20,26 @@ public class Grid<T> implements Iterable<Cell<T>> {
         this.height = data[0].length;
     }
 
+    public int count(T value) {
+        int total = 0;
+        for (Cell<T> cell : this) {
+            if (cell.value().equals(value)) {
+                total++;
+            }
+        }
+        return total;
+    }
+
+    public T put(int x, int y, T value) {
+        if (outOfBounds(x, y)) {
+            throw new GridException(MessageFormat.format("Out of bounds: ({0},{1})", x, y));
+        }
+
+        T prev = data[y][x];
+        data[y][x] = value;
+        return prev;
+    }
+
     public T get(int x, int y) {
         if (outOfBounds(x, y)) {
             throw new GridException(MessageFormat.format("Out of bounds: ({0},{1})", x, y));
@@ -28,10 +48,10 @@ public class Grid<T> implements Iterable<Cell<T>> {
         return data[y][x];
     }
 
-    public T neighbor(int x, int y, Direction direction) {
-        int nx = x + direction.getX();
-        int ny = y + direction.getY();
-        return get(nx, ny);
+    public Cell<T> neighbor(int x, int y, Direction direction) {
+        int nx = x + direction.x();
+        int ny = y + direction.y();
+        return new Cell<>(nx, ny, get(nx, ny));
     }
 
     public boolean isEdge(int x, int y) {
@@ -48,6 +68,16 @@ public class Grid<T> implements Iterable<Cell<T>> {
         if (y < 0 || y >= height) return true;
 
         return false;
+    }
+
+    public Cell<T> findOne(T value) {
+        for (Cell<T> cell : this) {
+            if (cell.value().equals(value)) {
+                return cell;
+            }
+        }
+
+        throw new GridException(value + " not found");
     }
 
     public static Grid<Character> create(List<String> data) {
