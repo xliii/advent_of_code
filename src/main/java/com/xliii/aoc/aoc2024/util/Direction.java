@@ -1,28 +1,37 @@
 package com.xliii.aoc.aoc2024.util;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public enum Direction {
 
     NORTH(0,-1, '^'),
 
-    NORTH_EAST(1,-1, ' '),
+    NORTH_EAST(1,-1, '↗'),
 
     EAST(1,0, '>'),
 
-    SOUTH_EAST(1,1, ' '),
+    SOUTH_EAST(1,1, '↘'),
 
     SOUTH(0,1, 'v'),
 
-    SOUTH_WEST(-1,1, ' '),
+    SOUTH_WEST(-1,1, '↙'),
 
     WEST(-1,0, '<'),
 
-    NORTH_WEST(-1,-1, ' ');
+    NORTH_WEST(-1,-1, '↖');
 
     public final static List<Direction> ORTHOGONAL = List.of(NORTH, EAST, SOUTH, WEST);
     public final static List<Direction> DIAGONAL = List.of(NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST);
     public final static List<Direction> ALL = List.of(values());
+    private final static Map<Character, Direction> bySign = new HashMap<>();
+
+    static {
+        for (Direction dir : values()) {
+            bySign.put(dir.sign, dir);
+        }
+    }
 
     private final int x;
     private final int y;
@@ -72,22 +81,14 @@ public enum Direction {
     }
 
     public static boolean isDirection(char sign) {
-        for (Direction value : values()) {
-            if (value.sign == sign) {
-                return true;
-            }
-        }
-        return false;
+        return bySign.containsKey(sign);
     }
 
     public static Direction bySign(char sign) {
-        //TODO sign to direction cache
-        for (Direction value : values()) {
-            if (value.sign == sign) {
-                return value;
-            }
+        if (isDirection(sign)) {
+            throw new IllegalArgumentException("No direction for sign: " + sign);
         }
 
-        throw new IllegalArgumentException("No direction for sign: " + sign);
+        return bySign.get(sign);
     }
 }
