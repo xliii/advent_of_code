@@ -7,10 +7,7 @@ import com.xliii.aoc.aoc2024.util.grid.Cell;
 import com.xliii.aoc.aoc2024.util.grid.Grid;
 import com.xliii.aoc.aoc2024.util.grid.GridException;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Day6 extends Puzzle {
 
@@ -26,11 +23,19 @@ public class Day6 extends Puzzle {
     }
 
     private static final Character USED = 'X';
+    private static final Character USED_CHECK = 'x';
     private static final Character EMPTY = '.';
     private static final Character WALL = '#';
     private static final Character BLOCK = '0';
+    private static final Character START = 'S';
+    private static final Character LOOP = '*';
 
-    private record Point(int x, int y) {}
+    private record Point(int x, int y) {
+        @Override
+        public String toString() {
+            return "(" + x + ":" + y + ")";
+        }
+    }
 
     private record PointWithDirection(int x, int y, Direction direction) {}
 
@@ -39,7 +44,9 @@ public class Day6 extends Puzzle {
         colorMap.put(EMPTY, Color.BLACK);
         colorMap.put(WALL, Color.BLUE);
         colorMap.put(USED, Color.GREEN);
+        colorMap.put(USED_CHECK, Color.YELLOW);
         colorMap.put(BLOCK, Color.RED);
+        colorMap.put(START, Color.RED);
         for (Direction dir : Direction.ORTHOGONAL) {
             colorMap.put(dir.sign(), Color.RED);
         }
@@ -56,7 +63,7 @@ public class Day6 extends Puzzle {
         Cell<Character> guard = grid.findOne(direction.sign());
         int x = guard.x();
         int y = guard.y();
-        Set<PointWithDirection> used = new HashSet<>();
+        List<PointWithDirection> used = new ArrayList<>();
         used.add(new PointWithDirection(x, y, direction));
 
         Set<Point> potentialBlocks = new HashSet<>();
@@ -73,19 +80,24 @@ public class Day6 extends Puzzle {
                     //try blocking next and checking loop
                     if (!potentialBlocks.contains(new Point(next.x(), next.y()))) {
                         log.info("Checking potential block @ " + x + ":" + y);
-                        Set<PointWithDirection> usedCopy = new HashSet<>(used);
+                        List<PointWithDirection> usedCopy = new ArrayList<>(used); // sorted for marking loop
                         Grid<Character> gridCopy = grid.copy();
+                        gridCopy.put(x, y, START);
                         gridCopy.put(next.x(), next.y(), WALL);
-                        if (isLoop(gridCopy, x, y, direction)) {
+                        if (isLoop(gridCopy, x, y, direction, usedCopy)) {
                             log.error("Found block @ " + x + ":" + y);
                             potentialBlocks.add(new Point(next.x(), next.y()));
                             gridCopy.put(next.x(), next.y(), BLOCK);
 //                            log.info(grid);
 //                            log.error("_".repeat(grid.getWidth()));
 
-                            log.info(gridCopy);
-                            log.error("_".repeat(gridCopy.getWidth()));
+//                            log.info(gridCopy);
+//                            log.error("_".repeat(gridCopy.getWidth()));
+
+
                         }
+
+
                     }
 
 
@@ -108,7 +120,7 @@ public class Day6 extends Puzzle {
 
         log.info(grid);
 
-        Grid<Character> cleanGrid = Grid.create(getInput());
+        Grid<Character> cleanGrid = Grid.create(getInput(), colorMap());
         for (Point block : potentialBlocks) {
             cleanGrid.put(block.x, block.y, BLOCK);
         }
@@ -118,8 +130,7 @@ public class Day6 extends Puzzle {
         log.info(potentialBlocks.size());
     }
 
-    private boolean isLoop(Grid<Character> grid, int x, int y, Direction direction) {
-        Set<PointWithDirection> used = new HashSet<>();
+    private boolean isLoop(Grid<Character> grid, int x, int y, Direction direction, List<PointWithDirection> used) {
         used.add(new PointWithDirection(x, y, direction));
 
         Cell<Character> next = grid.neighbor(x, y, direction);
@@ -131,7 +142,12 @@ public class Day6 extends Puzzle {
                     next = grid.neighbor(x, y, direction);
                 } else {
                     //log.info("Move " + direction);
-                    grid.put(x, y, USED);
+
+                    if (!grid.get(x, y).equals(START)) {
+                        //Don't overwrite start
+                        grid.put(x, y, USED_CHECK);
+                    }
+
                     grid.put(next.x(), next.y(), direction.sign());
 
                     //log.info(grid);
@@ -140,6 +156,19 @@ public class Day6 extends Puzzle {
                     y = next.y();
 
                     if (used.contains(new PointWithDirection(x, y, direction))) {
+                        boolean mark = false;
+                        for (PointWithDirection point : used) {
+                            if (point.x == x && point.y == y) {
+                                mark = true;
+                            }
+
+                            Character value = grid.get(point.x, point.y);
+                            //Mark loop
+                            //Don't overwrite start & guard
+                            if (mark && !value.equals(START) && !Direction.isDirection(value)) {
+                                grid.put(point.x, point.y, LOOP);
+                            }
+                        }
                         return true;
                     }
 
@@ -147,7 +176,7 @@ public class Day6 extends Puzzle {
                     next = grid.neighbor(x, y, direction);
                 }
             } catch (GridException e) {
-                grid.put(x, y, USED);
+                grid.put(x, y, USED_CHECK);
                 return false;
             }
         }

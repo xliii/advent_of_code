@@ -62,6 +62,15 @@ public enum Direction {
         }
     }
 
+    public static boolean isDirection(char sign) {
+        for (Direction value : values()) {
+            if (value.sign == sign) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static Direction bySign(char sign) {
         //TODO sign to direction cache
         for (Direction value : values()) {
