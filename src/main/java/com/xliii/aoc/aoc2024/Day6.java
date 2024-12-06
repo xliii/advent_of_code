@@ -56,15 +56,16 @@ public class Day6 extends Puzzle {
     private void solve2() {
         Grid<Character> grid = Grid.create(getInput(), colorMap());
 
-        Direction direction = Direction.NORTH;
+        Direction startDirection = Direction.NORTH;
+        Direction direction = startDirection;
 
         log.info(grid);
 
         int totalInitial = 0;
 
-        Cell<Character> guard = grid.findOne(direction.sign());
-        int x = guard.x();
-        int y = guard.y();
+        Cell<Character> start = grid.findOne(direction.sign());
+        int x = start.x();
+        int y = start.y();
         List<PointWithDirection> used = new ArrayList<>();
         used.add(new PointWithDirection(x, y, direction));
 
@@ -82,41 +83,17 @@ public class Day6 extends Puzzle {
                     //try blocking next and checking loop
                     if (!potentialBlocks.contains(new Point(next.x(), next.y()))) {
                         //log.info("Checking potential block @ " + x + ":" + y);
-                        List<PointWithDirection> usedCopy = new ArrayList<>(used); // sorted for marking loop
-                        Grid<Character> gridCopy = grid.copy();
-                        gridCopy.put(x, y, START);
-                        gridCopy.put(next.x(), next.y(), WALL);
-                        if (isLoop(gridCopy, x, y, direction, usedCopy)) {
-                            Grid<Character> freshGrid = Grid.create(getInput(), colorMap());
-                            freshGrid.put(next.x(), next.y(), WALL);
-                            if (!isLoop(freshGrid, guard.x(), guard.y(), Direction.NORTH, new ArrayList<>())) {
-
-                                log.info(gridCopy);
-                                log.error("_".repeat(gridCopy.getWidth()));
-                                log.info(freshGrid);
-                                log.error("_".repeat(gridCopy.getWidth()));
-
-                            } else {
-                                log.warn("loop from start");
-                                totalInitial++;
-                            }
-
-
+                        Grid<Character> loopCheckGrid = Grid.create(getInput(), colorMap());
+                        loopCheckGrid.put(next.x(), next.y(), WALL);
+                        if (isLoop(loopCheckGrid, start.x(), start.y(), startDirection)) {
                             log.error("Found block @ " + x + ":" + y);
 
+                            log.info(loopCheckGrid);
+                            log.error("_".repeat(loopCheckGrid.getWidth()));
+
                             potentialBlocks.add(new Point(next.x(), next.y()));
-                            gridCopy.put(next.x(), next.y(), BLOCK);
-//                            log.info(grid);
-//                            log.error("_".repeat(grid.getWidth()));
-
-//                            log.info(gridCopy);
-//                            log.error("_".repeat(gridCopy.getWidth()));
-
                         }
-
-
                     }
-
 
                     //log.info("Move " + direction);
                     grid.put(x, y, USED);
@@ -149,7 +126,8 @@ public class Day6 extends Puzzle {
         log.info("Total initial: " + totalInitial);
     }
 
-    private boolean isLoop(Grid<Character> grid, int x, int y, Direction direction, List<PointWithDirection> used) {
+    private boolean isLoop(Grid<Character> grid, int x, int y, Direction direction) {
+        List<PointWithDirection> used = new ArrayList<>();
         used.add(new PointWithDirection(x, y, direction));
 
         Cell<Character> next = grid.neighbor(x, y, direction);
