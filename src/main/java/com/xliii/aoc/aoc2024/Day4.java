@@ -22,7 +22,7 @@ public class Day4 extends Puzzle {
 
     @Override
     protected void run() {
-        //solve1();
+        solve1();
         solve2();
     }
 
@@ -137,7 +137,7 @@ public class Day4 extends Puzzle {
         return total;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] ignoredArgs) {
         Day4 puzzle = new Day4();
         puzzle.run();
     }

@@ -18,7 +18,7 @@ public class Day6 extends Puzzle {
 
     @Override
     protected void run() {
-        //solve1();
+        solve1();
         solve2();
     }
 
@@ -66,8 +66,6 @@ public class Day6 extends Puzzle {
         Cell<Character> start = grid.findOne(direction.sign());
         int x = start.x();
         int y = start.y();
-        List<PointWithDirection> used = new ArrayList<>();
-        used.add(new PointWithDirection(x, y, direction));
 
         Set<Point> potentialBlocks = new HashSet<>();
 
@@ -103,7 +101,6 @@ public class Day6 extends Puzzle {
                     x = next.x();
                     y = next.y();
 
-                    used.add(new PointWithDirection(x, y, direction));
                     next = grid.neighbor(x, y, direction);
                 }
             } catch (GridException e) {
@@ -218,7 +215,7 @@ public class Day6 extends Puzzle {
         log.success(grid.count(USED));
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] ignoredArgs) {
         Day6 puzzle = new Day6();
         puzzle.run();
     }

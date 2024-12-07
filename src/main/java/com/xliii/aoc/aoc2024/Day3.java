@@ -14,11 +14,11 @@ public class Day3 extends Puzzle {
         return false;
     }
 
-    private final String enable = "do()";
-    private final String disable = "don't()";
+    private final static String ENABLE = "do()";
+    private final static String DISABLE = "don't()";
 
     private final Pattern patternWithFlags = Pattern.compile("(mul\\([0-9]+,[0-9]+\\)|do\\(\\)|don't\\(\\))");
-    private final Pattern pattern = Pattern.compile("mul\\([0-9]+,[0-9]+\\)");
+    //private final Pattern pattern = Pattern.compile("mul\\([0-9]+,[0-9]+\\)");
     private final Pattern number = Pattern.compile("[0-9]+");
 
     private long calculate(String mul) {
@@ -45,10 +45,10 @@ public class Day3 extends Puzzle {
         boolean enabled = true;
         while (matcher.find()) {
             String token = matcher.group();
-            if (token.equals(enable)) {
+            if (token.equals(ENABLE)) {
                 log.success("Enable at " + matcher.start());
                 enabled = true;
-            } else if (token.equals(disable)) {
+            } else if (token.equals(DISABLE)) {
                 log.error("Disable at " + matcher.start());
                 enabled = false;
             } else if (enabled) {
@@ -67,7 +67,7 @@ public class Day3 extends Puzzle {
         return sum;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] ignoredArgs) {
         Day3 puzzle = new Day3();
         puzzle.run();
     }

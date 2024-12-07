@@ -134,7 +134,7 @@ public class Day2 extends Puzzle {
         processSafeWithToleration();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] ignoredArgs) {
         Day2 day2 = new Day2();
         day2.run();
     }

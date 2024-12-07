@@ -92,7 +92,7 @@ public class Day5 extends Puzzle {
         return true;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] ignoredArgs) {
         Day5 puzzle = new Day5();
         puzzle.run();
     }

@@ -60,7 +60,7 @@ public class Day1 extends Puzzle {
         log.success(similarity);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] ignoredArgs) {
         Day1 day1 = new Day1();
         day1.run();
     }

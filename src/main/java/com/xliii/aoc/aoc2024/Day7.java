@@ -108,7 +108,7 @@ public class Day7 extends Puzzle {
         log.success(result);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] ignoredArgs) {
         Day7 puzzle = new Day7();
         puzzle.run();
     }
