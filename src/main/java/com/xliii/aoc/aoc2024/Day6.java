@@ -63,7 +63,8 @@ public class Day6 extends Puzzle {
 
         int totalInitial = 0;
 
-        Cell<Character> start = grid.findOne(direction.sign());
+        Cell<Character> start = grid.findOne(direction.sign()).orElseThrow(
+                () -> new RuntimeException("Guard starting position not found"));
         int x = start.x();
         int y = start.y();
 
@@ -184,7 +185,9 @@ public class Day6 extends Puzzle {
 
         log.info(grid);
 
-        Cell<Character> guard = grid.findOne(direction.sign());
+        Cell<Character> guard = grid.findOne(direction.sign()).orElseThrow(
+                () -> new RuntimeException("Guard starting position not found"));
+
         int x = guard.x();
         int y = guard.y();
 

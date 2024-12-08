@@ -106,16 +106,14 @@ public class Grid<T> implements Iterable<Cell<T>> {
         return result;
     }
 
-
-    //TODO: Optional variant
-    public Cell<T> findOne(T value) {
+    public Optional<Cell<T>> findOne(T value) {
         for (Cell<T> cell : this) {
             if (cell.value().equals(value)) {
-                return cell;
+                return Optional.of(cell);
             }
         }
 
-        throw new GridException(value + " not found");
+        return Optional.empty();
     }
 
     public static Grid<Character> create(List<String> data) {
