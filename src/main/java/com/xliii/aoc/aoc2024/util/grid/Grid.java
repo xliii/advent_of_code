@@ -68,6 +68,14 @@ public class Grid<T> implements Iterable<Cell<T>> {
         return (x == 0 || x == width - 1) || (y == 0 || y == height - 1);
     }
 
+    public boolean inBounds(Vector2D pos) {
+        return inBounds(pos.x(), pos.y());
+    }
+
+    public boolean outOfBounds(Vector2D pos) {
+        return outOfBounds(pos.x(), pos.y());
+    }
+
     public boolean inBounds(int x, int y) {
         return !outOfBounds(x, y);
     }
@@ -80,6 +88,26 @@ public class Grid<T> implements Iterable<Cell<T>> {
         return false;
     }
 
+    public Set<T> distinctValues() {
+        Set<T> result = new HashSet<>();
+        for (Cell<T> cell : this) {
+            result.add(cell.value());
+        }
+        return result;
+    }
+
+    public Set<Cell<T>> findAll(T value) {
+        Set<Cell<T>> result = new HashSet<>();
+        for (Cell<T> cell : this) {
+            if (cell.value().equals(value)) {
+                result.add(cell);
+            }
+        }
+        return result;
+    }
+
+
+    //TODO: Optional variant
     public Cell<T> findOne(T value) {
         for (Cell<T> cell : this) {
             if (cell.value().equals(value)) {
