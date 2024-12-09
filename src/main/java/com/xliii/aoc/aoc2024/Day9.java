@@ -17,7 +17,7 @@ public class Day9 extends Puzzle {
 
     @Override
     protected void run() {
-        //solve1();
+        solve1();
         solve2();
     }
 
@@ -114,60 +114,32 @@ public class Day9 extends Puzzle {
                     continue;
                 }
 
-                if (rightFile.size == leftFile.size) {
-                    files.set(left, rightFile);
+                files.set(left, rightFile);
 
-                    int emptySpace = rightFile.size;
+                int diff = leftFile.size - rightFile.size;
+                int emptySpace = rightFile.size;
 
-                    if (right < files.size() - 1) {
-                        File afterRight = files.get(right + 1);
-                        if (afterRight.isEmpty()) {
-                            emptySpace += afterRight.size;
-                            files.remove(right + 1);
-                        }
+                if (right < files.size() - 1) {
+                    File afterRight = files.get(right + 1);
+                    if (afterRight.isEmpty()) {
+                        emptySpace += afterRight.size;
+                        files.remove(right + 1);
                     }
+                }
 
-                    if (right > 0) {
-                        File beforeRight = files.get(right - 1);
-                        if (beforeRight.isEmpty()) {
-                            emptySpace += beforeRight.size;
-                            files.remove(right - 1);
-                            right--;
-                        }
-                    }
+                File beforeRight = files.get(right - 1);
+                if (beforeRight.isEmpty()) {
+                    emptySpace += beforeRight.size;
+                    files.remove(right - 1);
+                    right--;
+                }
 
-                    files.set(right, File.empty(emptySpace));
-
-                    //Merge spaces
-                } else {
-                    //Fit partially
-                    files.set(left, rightFile);
-
-                    int diff = leftFile.size - rightFile.size;
-                    int emptySpace = rightFile.size;
-
-                    if (right < files.size() - 1) {
-                        File afterRight = files.get(right + 1);
-                        if (afterRight.isEmpty()) {
-                            emptySpace += afterRight.size;
-                            files.remove(right + 1);
-                        }
-                    }
-
-                    if (right > 0) {
-                        File beforeRight = files.get(right - 1);
-                        if (beforeRight.isEmpty()) {
-                            emptySpace += beforeRight.size;
-                            files.remove(right - 1);
-                            right--;
-                        }
-                    }
-
-                    files.set(right, File.empty(emptySpace));
+                files.set(right, File.empty(emptySpace));
+                if (diff > 0) {
                     files.add(left + 1, File.empty(diff));
                     right++;
                 }
-                //log.info(files);
+
                 break;
             }
         }
