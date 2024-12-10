@@ -50,6 +50,10 @@ public class Grid<T> implements Iterable<Cell<T>> {
         return prev;
     }
 
+    public T get(Vector2D pos) {
+        return get(pos.x(), pos.y());
+    }
+
     public T get(int x, int y) {
         if (outOfBounds(x, y)) {
             throw new GridException(MessageFormat.format("Out of bounds: ({0},{1})", x, y));

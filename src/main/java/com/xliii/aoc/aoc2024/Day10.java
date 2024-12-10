@@ -33,13 +33,19 @@ public class Day10 extends Puzzle {
 
         log.info(grid);
 
+        var peaks = grid.findAll('9');
+        for (var peak : peaks) {
+            walkPeak(peak);
+        }
+
         int total = 0;
 
         var starts = grid.findAll('0');
         for (var start : starts) {
-            var peaks = walkStart(start);
-            log.warn(start + " -> " + peaks.size());
-            total += peaks.size();
+            Integer rating = scoreMap.get(start.pos());
+            log.warn(start + " -> " + rating);
+            total += rating;
+
         }
 
         log.success(total);
@@ -95,19 +101,18 @@ public class Day10 extends Puzzle {
     private void walkPeak(Cell<Character> peak) {
         scoreMap.put(peak.x(), peak.y(), 1);
         for (var neighbor : grid.neighbors(peak.x(), peak.y(), Direction.ORTHOGONAL)) {
-            walk(neighbor, '8', 1);
+            walk(neighbor, '8');
         }
     }
 
-    private void walk(Cell<Character> cell, char height, int score) {
+    private void walk(Cell<Character> cell, char height) {
         if (height < '0') return;
 
         if (cell.value().equals(height)) {
             int currentScore = scoreMap.get(cell.x(), cell.y()) + 1;
             scoreMap.put(cell.x(), cell.y(), currentScore);
-            System.out.println(scoreMap);
             for (var neighbor : grid.neighbors(cell.x(), cell.y(), Direction.ORTHOGONAL)) {
-                walk(neighbor, (char) (height - 1), 1);
+                walk(neighbor, (char) (height - 1));
             }
         }
     }
