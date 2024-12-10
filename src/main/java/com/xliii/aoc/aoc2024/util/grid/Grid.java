@@ -58,6 +58,24 @@ public class Grid<T> implements Iterable<Cell<T>> {
         return data[y][x];
     }
 
+    public List<Cell<T>> neighbors(int x, int y, List<Direction> directions) {
+        return directions.stream()
+                .map(d -> neighborSafe(x, y, d))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
+
+    public Optional<Cell<T>> neighborSafe(int x, int y, Direction direction) {
+        int nx = x + direction.x();
+        int ny = y + direction.y();
+        if (inBounds(nx, ny)) {
+            return Optional.of(new Cell<>(nx, ny, get(nx, ny)));
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public Cell<T> neighbor(int x, int y, Direction direction) {
         int nx = x + direction.x();
         int ny = y + direction.y();
@@ -126,6 +144,10 @@ public class Grid<T> implements Iterable<Cell<T>> {
                     s -> s.chars().mapToObj(c -> (char) c).toArray(Character[]::new)
                 ).toArray(Character[][]::new);
         return Grid.create(grid, colorMap);
+    }
+
+    public static <T> Grid<T> create(T[][] data) {
+       return create(data, new HashMap<>());
     }
 
     public static <T> Grid<T> create(T[][] data, Map<T, Color> colorMap) {
