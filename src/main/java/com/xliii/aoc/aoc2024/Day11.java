@@ -55,7 +55,6 @@ public class Day11 extends Puzzle {
 
 
     private long countStone(long stone, int depth) {
-        System.out.println(stone + "@" + depth);
         if (depth == 0) {
             return 1;
         }
