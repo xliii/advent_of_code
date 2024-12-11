@@ -28,8 +28,7 @@ public class Day11 extends Puzzle {
     private void solve2() {
         int steps = 75;
         long sum = transformedInput().stream()
-                .map(stone -> new Entry(stone, steps))
-                .map(this::countStone)
+                .map(stone -> memoizedCountStone(stone, steps))
                 .reduce(Long::sum)
                 .orElseThrow();
 
@@ -39,45 +38,42 @@ public class Day11 extends Puzzle {
     private void solve1() {
         int steps = 25;
         long sum = transformedInput().stream()
-                .map(stone -> new Entry(stone, steps))
-                .map(this::countStone)
+                .map(stone -> memoizedCountStone(stone, steps))
                 .reduce(Long::sum)
                 .orElseThrow();
 
         log.success(sum);
     }
 
-    private long countStone(Entry entry) {
-        if (entry.depth == 0) {
+    private long memoizedCountStone(long stone, int depth) {
+        Entry entry = new Entry(stone, depth);
+        if (!cache.containsKey(entry)) {
+            cache.put(entry, countStone(entry.stone, entry.depth));
+        }
+        return cache.get(entry);
+    }
+
+
+    private long countStone(long stone, int depth) {
+        System.out.println(stone + "@" + depth);
+        if (depth == 0) {
             return 1;
         }
 
-        if (entry.stone == 0) {
-            if (!cache.containsKey(entry)) {
-                cache.put(entry, countStone(new Entry(1L, entry.depth - 1)));
-            }
-            return cache.get(entry);
-        } else if (entry.stone.toString().length() % 2 == 0) {
-            String str = entry.stone.toString();
-            Long left = Long.valueOf(str.substring(0, str.length() / 2));
-            Long right = Long.valueOf(str.substring(str.length() / 2));
-            if (!cache.containsKey(entry)) {
-                cache.put(entry,
-                        countStone(new Entry(left, entry.depth - 1))
-                      + countStone(new Entry(right, entry.depth - 1))
-                );
-            }
-            return cache.get(entry);
+        if (stone == 0) {
+            return memoizedCountStone(1, depth - 1);
+        } else if (String.valueOf(stone).length() % 2 == 0) {
+            String str = String.valueOf(stone);
+            long left = Long.parseLong(str.substring(0, str.length() / 2));
+            long right = Long.parseLong(str.substring(str.length() / 2));
+            return memoizedCountStone(left, depth - 1) + countStone(right, depth - 1);
         } else {
-            if (!cache.containsKey(entry)) {
-                cache.put(entry, countStone(new Entry(entry.stone * 2024, entry.depth - 1)));
-            }
-            return cache.get(entry);
+            return memoizedCountStone(stone * 2024, depth - 1);
         }
     }
 
-    private List<Long> transformedInput() {
-        return Arrays.stream(getInput().getFirst().split(" ")).map(Long::valueOf).toList();
+    private List<Integer> transformedInput() {
+        return Arrays.stream(getInput().getFirst().split(" ")).map(Integer::valueOf).toList();
     }
 
     public static void main(String[] ignoredArgs) {
