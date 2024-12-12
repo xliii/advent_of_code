@@ -13,7 +13,7 @@ public class Day12 extends Puzzle {
 
     @Override
     protected boolean useExample() {
-        return true;
+        return false;
     }
 
     @Override
@@ -23,7 +23,12 @@ public class Day12 extends Puzzle {
     }
 
     private void solve2() {
+        Grid<Character> grid = Grid.create(getInput());
+        Set<Region> regions = split(grid);
+        regions.forEach(region -> log.info(region));
 
+        var price = regions.stream().map(Region::price).reduce(Integer::sum).orElseThrow();
+        log.success(price);
     }
 
     private record Region(Character plant, List<Vector2D> points) {
@@ -65,30 +70,50 @@ public class Day12 extends Puzzle {
 
     private Set<Region> split(Grid<Character> grid) {
         Set<Region> regions = new HashSet<>();
-        for (Character plant : grid.distinctValues()) {
-            var plants = grid.findAll(plant);
-            regions.addAll(formRegions(plants));
-        }
-        return regions;
-    }
-
-    private Set<Region> formRegions(List<Cell<Character>> plants) {
-        var iterator = plants.iterator();
-        Set<Region> regions = new HashSet<>();
-
-        //TODO: Fix region forming
-        while (iterator.hasNext()) {
-            var plant = iterator.next();
-            Optional<Region> existingRegion = regions.stream()
-                    .filter(region -> region.points.stream()
-                            .anyMatch(point -> point.isNeighbor(plant.pos())))
-                    .findFirst();
-            if (existingRegion.isPresent()) {
-                existingRegion.get().points.add(plant.pos());
-            } else {
-                var newRegion = new Region(plant.value(), new ArrayList<>(List.of(plant.pos())));
-                regions.add(newRegion);
+        Set<Vector2D> seen = new HashSet<>();
+        for (var cell : grid) {
+            if (seen.contains(cell.pos())) {
+                continue;
             }
+
+            Queue<Cell<Character>> toCheck = new LinkedList<>();
+            toCheck.add(cell);
+            while (!toCheck.isEmpty()) {
+                Cell<Character> current = toCheck.poll();
+                seen.add(current.pos());
+
+                Optional<Region> existingRegion = regions.stream()
+                        .filter(region -> region.plant().equals(current.value()))
+                        .filter(region -> region.points.stream()
+                                .anyMatch(point -> point.isNeighbor(current.pos())))
+                        .findFirst();
+                if (existingRegion.isPresent()) {
+                    existingRegion.get().points.add(current.pos());
+                } else {
+                    var newRegion = new Region(current.value(), new ArrayList<>());
+                    newRegion.points.add(current.pos());
+                    regions.add(newRegion);
+                }
+
+                for (var neighbor : grid.neighbors(current.x(), current.y(), Direction.ORTHOGONAL)) {
+                    if (!neighbor.value().equals(current.value())) {
+                        continue;
+                    }
+
+                    if (seen.contains(neighbor.pos())) {
+                        continue;
+                    }
+
+                    if (toCheck.contains(neighbor)) {
+                        continue;
+                    }
+
+                    toCheck.add(neighbor);
+                }
+            }
+
+
+
         }
         return regions;
     }
