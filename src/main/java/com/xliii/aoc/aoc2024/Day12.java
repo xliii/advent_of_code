@@ -27,7 +27,7 @@ public class Day12 extends Puzzle {
         Set<Region> regions = split(grid);
         regions.forEach(region -> log.info(region));
 
-        var price = regions.stream().map(Region::price).reduce(Integer::sum).orElseThrow();
+        var price = regions.stream().map(Region::price2).reduce(Integer::sum).orElseThrow();
         log.success(price);
     }
 
@@ -40,7 +40,7 @@ public class Day12 extends Puzzle {
         public int perimeter() {
             int perimeter = 0;
             for (var point : points) {
-                for (var neighbor: point.neighbors(Direction.ORTHOGONAL)) {
+                for (var neighbor : point.neighbors(Direction.ORTHOGONAL)) {
                     if (!points.contains(neighbor)) {
                         perimeter++;
                     }
@@ -49,13 +49,54 @@ public class Day12 extends Puzzle {
             return perimeter;
         }
 
+        public int sides() {
+            //sides = angles
+            int angles = 0;
+
+            Set<List<Direction>> corners = new HashSet<>();
+
+            for (var diagonal : Direction.DIAGONAL) {
+                var next = diagonal.rotate45(true);
+                var prev = diagonal.rotate45(false);
+                corners.add(List.of(diagonal, next, prev));
+            }
+
+            for (var point : points) {
+                for (var corner : corners) {
+                    var diagonal = point.move(corner.get(0));
+                    var next = point.move(corner.get(1));
+                    var prev = point.move(corner.get(2));
+
+                    if (!points.contains(diagonal) && !points.contains(next) && !points.contains(prev)) {
+                        //outer angle
+                        angles++;
+                    } else if (!points.contains(diagonal) && points.contains(next) && points.contains(prev)) {
+                        //inner angle
+                        angles++;
+                    } else if (points.contains(diagonal) && !points.contains(next) && !points.contains(prev)) {
+                        //inner across angle
+                        //AAA
+                        //ABA
+                        //BAA
+                        angles++;
+                    }
+                }
+            }
+
+            return angles;
+        }
+
         public int price() {
             return area() * perimeter();
         }
 
+        public int price2() {
+            return area() * sides();
+        }
+
         @Override
         public String toString() {
-            return MessageFormat.format("- A region of {0} plants with price {1}*{2}={3} {4}'}'", plant, area(), perimeter(), price(), points);
+            return MessageFormat.format("- A region of {0} plants with price {1}*{2}={3} {4}'}'", plant, area(), sides(), price2(), points);
         }
     }
 
