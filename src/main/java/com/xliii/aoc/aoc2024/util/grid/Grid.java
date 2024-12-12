@@ -118,8 +118,8 @@ public class Grid<T> implements Iterable<Cell<T>> {
         return result;
     }
 
-    public Set<Cell<T>> findAll(T value) {
-        Set<Cell<T>> result = new HashSet<>();
+    public List<Cell<T>> findAll(T value) {
+        List<Cell<T>> result = new ArrayList<>();
         for (Cell<T> cell : this) {
             if (cell.value().equals(value)) {
                 result.add(cell);

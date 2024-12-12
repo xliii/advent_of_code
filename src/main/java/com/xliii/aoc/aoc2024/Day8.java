@@ -34,7 +34,7 @@ public class Day8 extends Puzzle {
         Set<Vector2D> result = new HashSet<>();
 
         for (Character frequency : distinct) {
-            Set<Cell<Character>> antennas = grid.findAll(frequency);
+            Set<Cell<Character>> antennas = new HashSet<>(grid.findAll(frequency));
             log.info(frequency + " -> " + antennas);
 
             Set<Set<Cell<Character>>> pairs = Sets.combinations(antennas, 2);
@@ -109,7 +109,7 @@ public class Day8 extends Puzzle {
         Set<Vector2D> result = new HashSet<>();
 
         for (Character frequency : distinct) {
-            Set<Cell<Character>> antennas = grid.findAll(frequency);
+            Set<Cell<Character>> antennas = new HashSet<>(grid.findAll(frequency));
             log.info(frequency + " -> " + antennas);
 
             Set<Set<Cell<Character>>> pairs = Sets.combinations(antennas, 2);
