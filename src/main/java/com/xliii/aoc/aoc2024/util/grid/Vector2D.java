@@ -5,6 +5,9 @@ import com.xliii.aoc.aoc2024.util.Direction;
 import java.util.List;
 
 public record Vector2D(int x, int y) {
+
+    public static Vector2D ZERO = new Vector2D(0, 0);
+
     @Override
     public String toString() {
         return "(" + x + ":" + y + ")";
