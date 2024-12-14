@@ -1,11 +1,11 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
-import com.xliii.aoc.aoc2024.util.Color;
-import com.xliii.aoc.aoc2024.util.Direction;
-import com.xliii.aoc.aoc2024.util.grid.Cell;
-import com.xliii.aoc.aoc2024.util.grid.Grid;
-import com.xliii.aoc.aoc2024.util.grid.GridException;
+import com.xliii.aoc.util.Color;
+import com.xliii.aoc.util.Direction;
+import com.xliii.aoc.util.grid.Cell;
+import com.xliii.aoc.util.grid.Grid;
+import com.xliii.aoc.util.grid.GridException;
 
 import java.util.*;
 

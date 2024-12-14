@@ -1,6 +1,6 @@
 package com.xliii.aoc;
 
-import com.xliii.aoc.aoc2024.util.Logger;
+import com.xliii.aoc.util.Logger;
 
 import java.io.File;
 import java.io.IOException;

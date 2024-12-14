@@ -1,4 +1,4 @@
-package com.xliii.aoc.aoc2024.util;
+package com.xliii.aoc.util;
 
 import java.util.HashMap;
 import java.util.List;

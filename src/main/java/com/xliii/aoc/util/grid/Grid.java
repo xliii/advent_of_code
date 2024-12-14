@@ -1,7 +1,7 @@
-package com.xliii.aoc.aoc2024.util.grid;
+package com.xliii.aoc.util.grid;
 
-import com.xliii.aoc.aoc2024.util.Color;
-import com.xliii.aoc.aoc2024.util.Direction;
+import com.xliii.aoc.util.Color;
+import com.xliii.aoc.util.Direction;
 
 import java.text.MessageFormat;
 import java.util.*;

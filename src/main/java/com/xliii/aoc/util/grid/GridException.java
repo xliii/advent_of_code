@@ -1,4 +1,4 @@
-package com.xliii.aoc.aoc2024.util.grid;
+package com.xliii.aoc.util.grid;
 
 public class GridException extends RuntimeException {
 

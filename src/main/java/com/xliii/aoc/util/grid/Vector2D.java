@@ -1,6 +1,6 @@
-package com.xliii.aoc.aoc2024.util.grid;
+package com.xliii.aoc.util.grid;
 
-import com.xliii.aoc.aoc2024.util.Direction;
+import com.xliii.aoc.util.Direction;
 
 import java.util.List;
 

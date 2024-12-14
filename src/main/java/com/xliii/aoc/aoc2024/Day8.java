@@ -1,10 +1,10 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
-import com.xliii.aoc.aoc2024.util.Sets;
-import com.xliii.aoc.aoc2024.util.grid.Cell;
-import com.xliii.aoc.aoc2024.util.grid.Grid;
-import com.xliii.aoc.aoc2024.util.grid.Vector2D;
+import com.xliii.aoc.util.Sets;
+import com.xliii.aoc.util.grid.Cell;
+import com.xliii.aoc.util.grid.Grid;
+import com.xliii.aoc.util.grid.Vector2D;
 
 import java.util.ArrayList;
 import java.util.HashSet;

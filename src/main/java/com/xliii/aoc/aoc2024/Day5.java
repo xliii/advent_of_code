@@ -1,7 +1,7 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
-import com.xliii.aoc.aoc2024.util.Sets;
+import com.xliii.aoc.util.Sets;
 
 import java.util.*;
 import java.util.stream.Collectors;

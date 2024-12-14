@@ -1,7 +1,7 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
-import com.xliii.aoc.aoc2024.util.grid.BigVector2D;
+import com.xliii.aoc.util.grid.BigVector2D;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
