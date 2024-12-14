@@ -1,17 +1,15 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
-import com.xliii.aoc.aoc2024.util.grid.Vector2D;
+import com.xliii.aoc.aoc2024.util.grid.BigVector2D;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.lang.Integer.parseInt;
 
 public class Day13 extends Puzzle {
 
@@ -23,9 +21,10 @@ public class Day13 extends Puzzle {
     private final Pattern buttonPattern = Pattern.compile("Button .: X\\+([0-9]+), Y\\+([0-9]+)");
     private final Pattern prizePattern = Pattern.compile("Prize: X=([0-9]+), Y=([0-9]+)");
 
-    private final Map<State, Integer> cache = new ConcurrentHashMap<>();
+    private final BigDecimal INVALID = BigDecimal.ZERO;
+    private final BigDecimal THREE = new BigDecimal("3");
 
-    private final Integer INVALID = Integer.MAX_VALUE;
+    private final BigDecimal PRIZE_OFFSET = new BigDecimal("10000000000000");
 
     @Override
     protected void run() {
@@ -34,52 +33,59 @@ public class Day13 extends Puzzle {
     }
 
     private void solve2() {
+        var tokens = getCaseInput().stream()
+                .map(this::solve)
+                .filter(cost -> !cost.equals(INVALID))
+                .reduce(BigDecimal::add).orElseThrow();
 
+        log.success(tokens);
     }
 
     private void solve1() {
         var tokens = getCaseInput().stream()
                 .map(this::solve)
                 .filter(cost -> !cost.equals(INVALID))
-                .reduce(Integer::sum).orElseThrow();
+                .reduce(BigDecimal::add).orElseThrow();
 
         log.success(tokens);
     }
 
-    private int memoizedSolve(State state) {
-        if (!cache.containsKey(state)) {
-            cache.put(state, solve(state));
-        }
+    private BigDecimal solve(State state) {
+        //     b.x * p.y - b.y * p.x
+        // a = ---------------------
+        //     b.x * a.y - b.y * a.x
+        BigDecimal aDividend = ((state.b.x().multiply(state.prize.y())).subtract(state.b.y().multiply(state.prize.x())));
+        BigDecimal aDivisor = ((state.b.x().multiply(state.a.y())).subtract(state.b.y().multiply(state.a.x())));
 
-        return cache.get(state);
-    }
+        //     a.x * p.y - a.y * p.x
+        // b = ---------------------
+        //     a.x * b.y - a.y * b.x
+        BigDecimal bDividend = ((state.a.x().multiply(state.prize.y())).subtract(state.a.y().multiply(state.prize.x())));
+        BigDecimal bDivisor = ((state.a.x().multiply(state.b.y())).subtract(state.a.y().multiply(state.b.x())));
 
-    private int solve(State state) {
-        if (state.prize.equals(Vector2D.ZERO)) {
-            return state.cost();
-        }
-
-        if (state.prize.x() < 0 || state.prize.y() < 0) {
+        //modulo check
+        if (!aDividend.remainder(aDivisor).equals(BigDecimal.ZERO)) {
             return INVALID;
         }
 
-        if (state.aPressed > 100 || state.bPressed > 100) {
+        if (!bDividend.remainder(bDivisor).equals(BigDecimal.ZERO)) {
             return INVALID;
         }
 
-        return Math.min(memoizedSolve(new State(state.a, state.b, state.prize.subtract(state.a),
-                        state.aPressed + 1, state.bPressed)),
-                memoizedSolve(new State(state.a, state.b, state.prize.subtract(state.b),
-                        state.aPressed, state.bPressed + 1)));
+        BigDecimal a = aDividend.divide(aDivisor, RoundingMode.UNNECESSARY);
+        BigDecimal b = bDividend.divide(bDivisor, RoundingMode.UNNECESSARY);
 
+        // cost = a * 3 + b
+        return a.multiply(THREE).add(b);
     }
 
-    record State(Vector2D a, Vector2D b, Vector2D prize, int aPressed, int bPressed) {
+    record State(BigVector2D a, BigVector2D b, BigVector2D prize, int aPressed, int bPressed) {
         public int cost() {
             return aPressed * 3 + bPressed;
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private List<State> getCaseInput() {
         List<State> states = new ArrayList<>();
         Iterator<String> inputIt = getInput().iterator();
@@ -91,9 +97,10 @@ public class Day13 extends Puzzle {
             b.find();
             p.find();
 
-            Vector2D buttonA = new Vector2D(parseInt(a.group(1)), parseInt(a.group(2)));
-            Vector2D buttonB = new Vector2D(parseInt(b.group(1)), parseInt(b.group(2)));
-            Vector2D prize = new Vector2D(parseInt(p.group(1)), parseInt(p.group(2)));
+            BigVector2D buttonA = BigVector2D.of(a.group(1), a.group(2));
+            BigVector2D buttonB = BigVector2D.of(b.group(1), b.group(2));
+            BigVector2D prize = BigVector2D.of(p.group(1), p.group(2));
+            prize = prize.add(new BigVector2D(PRIZE_OFFSET, PRIZE_OFFSET));
 
             states.add(new State(buttonA, buttonB, prize, 0, 0));
 
