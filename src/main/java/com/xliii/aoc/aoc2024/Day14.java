@@ -5,6 +5,7 @@ import com.xliii.aoc.aoc2024.util.Color;
 import com.xliii.aoc.aoc2024.util.Direction;
 import com.xliii.aoc.aoc2024.util.grid.Vector2D;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class Day14 extends Puzzle {
 
     @Override
     protected boolean useExample() {
-        return true;
+        return false;
     }
 
     private final int DURATION = 100;
@@ -34,6 +35,7 @@ public class Day14 extends Puzzle {
     @Override
     protected void run() {
         solve1();
+        solve1Old();
         solve2();
     }
 
@@ -58,13 +60,34 @@ public class Day14 extends Puzzle {
 
     private void solve1() {
         List<Robot> robots = getRobotInput();
+
+        int[] quadrants = new int[4];
+
+        int halfWidth = WIDTH() / 2;
+        int halfHeight = HEIGHT() / 2;
+
+        for (var robot : robots) {
+            int x = (((robot.pos.x() + robot.velocity.x() * DURATION) % WIDTH()) + WIDTH()) % WIDTH();
+            int y = (((robot.pos.y() + robot.velocity.y() * DURATION) % HEIGHT()) + HEIGHT()) % HEIGHT();
+
+            if (x == halfWidth || y == halfHeight) continue;
+
+            var i = ((x < halfWidth) ? 1 : 0) * 2 + (y < halfHeight ? 1 : 0);
+            quadrants[i]++;
+        }
+
+        log.info(Arrays.toString(quadrants));
+        log.info(Arrays.stream(quadrants).reduce(1, (a,b) -> a*b));
+    }
+
+    private void solve1Old() {
+        List<Robot> robots = getRobotInput();
         for (int i = 0; i < DURATION; i++) {
             robots = move(robots);
-            printRobots(robots, false, false);
-            log.info();
+            //printRobots(robots, false, false);
 
         }
-        printRobots(robots, true, false);
+        //printRobots(robots, true, false);
         log.error(score(robots));
     }
 
@@ -113,7 +136,7 @@ public class Day14 extends Puzzle {
         for (int y = 0; y < HEIGHT(); y++) {
             for (int x = 0; x < WIDTH(); x++) {
                 if (skipMiddle && (x == WIDTH() / 2 || y == HEIGHT() / 2)) {
-                    sb.append(Color.CYAN.text("."));
+                    sb.append(Color.BLACK.text("."));
                     continue;
                 }
 
