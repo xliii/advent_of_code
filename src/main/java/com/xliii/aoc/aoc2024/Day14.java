@@ -1,9 +1,11 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
+import com.xliii.aoc.aoc2024.util.Statistics;
 import com.xliii.aoc.aoc2024.util.grid.Grid;
 import com.xliii.aoc.aoc2024.util.grid.Vector2D;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -32,7 +34,8 @@ public class Day14 extends Puzzle {
     @Override
     protected void run() {
         solve1();
-        solve2();
+        //solve2();
+        solve2variance();
     }
 
     private record Robot(Vector2D pos, Vector2D velocity) {}
@@ -49,6 +52,48 @@ public class Day14 extends Puzzle {
                 );
             }
         ).toList();
+    }
+
+    private void solve2variance() {
+        List<Robot> robots = getRobotInput();
+
+        Character[][] data = new Character[HEIGHT()][WIDTH()];
+        Grid<Character> grid = Grid.create(data);
+
+        double minVariance = Double.MAX_VALUE;
+
+        int duration = 100;
+
+        while (true) {
+            grid.fill('.');
+            duration++;
+
+            List<Integer> xData = new ArrayList<>();
+            List<Integer> yData = new ArrayList<>();
+
+            for (var robot : robots) {
+                int x = (((robot.pos.x() + robot.velocity.x() * duration) % WIDTH()) + WIDTH()) % WIDTH();
+                int y = (((robot.pos.y() + robot.velocity.y() * duration) % HEIGHT()) + HEIGHT()) % HEIGHT();
+
+                xData.add(x);
+                yData.add(y);
+
+                Character cell = grid.get(x, y);
+                if (cell == '.') {
+                    grid.put(x,y, '1');
+                } else {
+                    grid.put(x, y, (char) (cell + 1));
+                }
+            }
+
+            var xVariance = Statistics.variance(xData);
+            var yVariance = Statistics.variance(yData);
+            var varianceSum = xVariance + yVariance;
+            if (varianceSum < minVariance) {
+                minVariance = varianceSum;
+                log.info("New minimum variance: " + minVariance + " @ " + duration);
+            }
+        }
     }
 
     private void solve2() {
