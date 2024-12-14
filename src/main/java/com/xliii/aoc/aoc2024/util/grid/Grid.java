@@ -17,8 +17,8 @@ public class Grid<T> implements Iterable<Cell<T>> {
 
     private Grid(T[][] data, Map<T, Color> colorMap) {
         this.data = data;
-        this.width = data.length;
-        this.height = data[0].length;
+        this.width = data[0].length;
+        this.height = data.length;
         this.colorMap = colorMap;
     }
 
@@ -126,6 +126,14 @@ public class Grid<T> implements Iterable<Cell<T>> {
             }
         }
         return result;
+    }
+
+    public void fill(T value) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                data[y][x] = value;
+            }
+        }
     }
 
     public Optional<Cell<T>> findOne(T value) {

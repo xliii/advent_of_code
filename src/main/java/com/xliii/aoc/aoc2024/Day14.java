@@ -3,6 +3,7 @@ package com.xliii.aoc.aoc2024;
 import com.xliii.aoc.Puzzle;
 import com.xliii.aoc.aoc2024.util.Color;
 import com.xliii.aoc.aoc2024.util.Direction;
+import com.xliii.aoc.aoc2024.util.grid.Grid;
 import com.xliii.aoc.aoc2024.util.grid.Vector2D;
 
 import java.util.Arrays;
@@ -66,9 +67,20 @@ public class Day14 extends Puzzle {
         int halfWidth = WIDTH() / 2;
         int halfHeight = HEIGHT() / 2;
 
+        Character[][] data = new Character[HEIGHT()][WIDTH()];
+        Grid<Character> grid = Grid.create(data);
+        grid.fill('.');
+
         for (var robot : robots) {
             int x = (((robot.pos.x() + robot.velocity.x() * DURATION) % WIDTH()) + WIDTH()) % WIDTH();
             int y = (((robot.pos.y() + robot.velocity.y() * DURATION) % HEIGHT()) + HEIGHT()) % HEIGHT();
+
+            Character cell = grid.get(x, y);
+            if (cell == '.') {
+                grid.put(x,y, '1');
+            } else {
+                grid.put(x, y, (char) (cell + 1));
+            }
 
             if (x == halfWidth || y == halfHeight) continue;
 
@@ -78,6 +90,8 @@ public class Day14 extends Puzzle {
 
         log.info(Arrays.toString(quadrants));
         log.info(Arrays.stream(quadrants).reduce(1, (a,b) -> a*b));
+
+        log.info(grid);
     }
 
     private void solve1Old() {
@@ -87,20 +101,20 @@ public class Day14 extends Puzzle {
             //printRobots(robots, false, false);
 
         }
-        //printRobots(robots, true, false);
+        printRobots(robots, false, false);
         log.error(score(robots));
     }
 
     private Direction quadrant(int x, int y) {
         //middle filtered out already
         if (x < WIDTH() / 2) {
-            if (y < WIDTH() / 2) {
+            if (y < HEIGHT() / 2) {
                 return Direction.NORTH_WEST;
             } else {
                 return Direction.SOUTH_WEST;
             }
         } else {
-            if (y < WIDTH() / 2) {
+            if (y < HEIGHT() / 2) {
                 return Direction.NORTH_EAST;
             } else {
                 return Direction.SOUTH_EAST;
