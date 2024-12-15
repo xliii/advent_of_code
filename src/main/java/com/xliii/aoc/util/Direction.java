@@ -85,7 +85,7 @@ public enum Direction {
     }
 
     public static Direction bySign(char sign) {
-        if (isDirection(sign)) {
+        if (!isDirection(sign)) {
             throw new IllegalArgumentException("No direction for sign: " + sign);
         }
 
