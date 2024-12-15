@@ -24,8 +24,8 @@ public class Day15 extends Puzzle {
     @Override
     protected void run() {
         //solve1();
-        solve2();
-        //solveInteractive();
+        //solve2();
+        solveInteractive();
     }
 
     private static final char WALL = '#';
@@ -49,14 +49,8 @@ public class Day15 extends Puzzle {
     private void solveInteractive() {
         readInput2();
         robot = grid.findOne(ROBOT).orElseThrow();
-        Interactive.run(input -> {
-            var direction = Direction.byAlias(input);
-            if (direction.isEmpty()) {
-                log.error("Invalid direction: " + input);
-                return;
-            }
-
-            robot = Day15.this.moveRobot2(robot, direction.get());
+        Interactive.directions(direction -> {
+            robot = Day15.this.moveRobot2(robot, direction);
             log.info(direction);
             log.info(grid);
         });

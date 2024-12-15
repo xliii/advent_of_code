@@ -8,6 +8,8 @@ public class Interactive {
 
     private static final List<String> QUIT = List.of("q", "quit");
 
+    private static final Logger log = new Logger();
+
     public static void run(Consumer<String> handler) {
         var in = new Scanner(System.in);
         while (in.hasNext()) {
@@ -18,5 +20,17 @@ public class Interactive {
 
             handler.accept(next);
         }
+    }
+
+    public static void directions(Consumer<Direction> handler) {
+        run(input -> {
+            var direction = Direction.byAlias(input);
+            if (direction.isEmpty()) {
+                log.error("Invalid direction: " + input);
+                return;
+            }
+
+            handler.accept(direction.get());
+        });
     }
 }
