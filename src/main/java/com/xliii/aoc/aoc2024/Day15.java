@@ -18,14 +18,14 @@ public class Day15 extends Puzzle {
 
     @Override
     protected boolean useExample() {
-        return true;
+        return false;
     }
 
     @Override
     protected void run() {
         //solve1();
-        //solve2();
-        solveInteractive();
+        solve2();
+        //solveInteractive();
     }
 
     private static final char WALL = '#';
@@ -68,8 +68,8 @@ public class Day15 extends Puzzle {
         int turn = 0;
         for (Direction move : moves) {
             robot = moveRobot2(robot, move);
-            log.info(++turn + ":" + move);
-            log.info(grid);
+            //log.info(++turn + ":" + move);
+            //log.info(grid);
         }
 
         log.info(grid);
@@ -143,7 +143,7 @@ public class Day15 extends Puzzle {
 
                 toMove.addAll(nextChecks.stream().filter(check -> check.value() != EMPTY).toList());
 
-                nextChecks = nextChecks.stream().flatMap(check ->
+                nextChecks = nextChecks.stream().filter(check -> !check.value().equals(EMPTY)).flatMap(check ->
                     Stream.of(
                         grid.neighbor(check.x(), check.y(), direction),
                         grid.neighbor(check.x(), check.y(), direction.rotate45(
