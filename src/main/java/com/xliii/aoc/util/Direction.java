@@ -1,46 +1,52 @@
 package com.xliii.aoc.util;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public enum Direction {
 
-    NORTH(0,-1, '^'),
+    NORTH(0,-1, '^', Set.of("n", "north", "up", "u")),
 
-    NORTH_EAST(1,-1, '↗'),
+    NORTH_EAST(1,-1, '↗', Set.of("ne")),
 
-    EAST(1,0, '>'),
+    EAST(1,0, '>', Set.of("e", "east", "right", "r")),
 
-    SOUTH_EAST(1,1, '↘'),
+    SOUTH_EAST(1,1, '↘', Set.of("se")),
 
-    SOUTH(0,1, 'v'),
+    SOUTH(0,1, 'v', Set.of("s", "south", "down", "d")),
 
-    SOUTH_WEST(-1,1, '↙'),
+    SOUTH_WEST(-1,1, '↙', Set.of("sw")),
 
-    WEST(-1,0, '<'),
+    WEST(-1,0, '<', Set.of("w", "west", "left", "l")),
 
-    NORTH_WEST(-1,-1, '↖');
+    NORTH_WEST(-1,-1, '↖', Set.of("nw"));
 
     public final static List<Direction> ORTHOGONAL = List.of(NORTH, EAST, SOUTH, WEST);
     public final static List<Direction> DIAGONAL = List.of(NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST);
     public final static List<Direction> ALL = List.of(values());
+
     private final static Map<Character, Direction> bySign = new HashMap<>();
+    private final static Map<String, Direction> byAlias = new HashMap<>();
 
     static {
         for (Direction dir : values()) {
             bySign.put(dir.sign, dir);
+
+            for (var alias : dir.aliases) {
+                byAlias.put(alias, dir);
+            }
         }
     }
 
     private final int x;
     private final int y;
     private final char sign;
+    private final Set<String> aliases;
 
-    Direction(int x, int y, char sign) {
+    Direction(int x, int y, char sign, Set<String> aliases) {
         this.x = x;
         this.y = y;
         this.sign = sign;
+        this.aliases = aliases;
     }
 
     public int x() {
@@ -84,11 +90,11 @@ public enum Direction {
         return bySign.containsKey(sign);
     }
 
-    public static Direction bySign(char sign) {
-        if (!isDirection(sign)) {
-            throw new IllegalArgumentException("No direction for sign: " + sign);
-        }
+    public static Optional<Direction> bySign(char sign) {
+        return Optional.ofNullable(bySign.getOrDefault(sign, null));
+    }
 
-        return bySign.get(sign);
+    public static Optional<Direction> byAlias(String alias) {
+        return Optional.ofNullable(byAlias.getOrDefault(alias, null));
     }
 }
