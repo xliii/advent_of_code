@@ -9,6 +9,7 @@ import com.xliii.aoc.util.grid.Grid;
 import java.util.Map;
 import java.util.Optional;
 
+//run with -Xss8m
 public class Day16 extends Puzzle {
 
     @Override
@@ -105,7 +106,7 @@ public class Day16 extends Puzzle {
             grid.put(x, y, direction.sign());
         }
 
-        log.info(grid);
+        //log.info(grid);
 
         if (current.value().equals(END)) {
             log.success("New best for END: " + score);
