@@ -62,6 +62,10 @@ public class Grid<T> implements Iterable<Cell<T>> {
         return data[y][x];
     }
 
+    public List<Cell<T>> neighbors(int x, int y) {
+        return neighbors(x, y, Direction.ORTHOGONAL);
+    }
+
     public List<Cell<T>> neighbors(int x, int y, List<Direction> directions) {
         return directions.stream()
                 .map(d -> neighborSafe(x, y, d))

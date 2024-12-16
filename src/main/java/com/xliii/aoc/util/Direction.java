@@ -1,5 +1,7 @@
 package com.xliii.aoc.util;
 
+import com.xliii.aoc.util.grid.Vector2D;
+
 import java.util.*;
 
 public enum Direction {
@@ -26,14 +28,17 @@ public enum Direction {
 
     private final static Map<Character, Direction> bySign = new HashMap<>();
     private final static Map<String, Direction> byAlias = new HashMap<>();
+    private final static Map<Vector2D, Direction> byVector = new HashMap<>();
 
     static {
-        for (Direction dir : values()) {
-            bySign.put(dir.sign, dir);
+        for (Direction direction : values()) {
+            bySign.put(direction.sign, direction);
+            byVector.put(new Vector2D(direction.x, direction.y), direction);
 
-            for (var alias : dir.aliases) {
-                byAlias.put(alias, dir);
+            for (var alias : direction.aliases) {
+                byAlias.put(alias, direction);
             }
+
         }
     }
 
@@ -48,6 +53,7 @@ public enum Direction {
         this.sign = sign;
         this.aliases = aliases;
     }
+
 
     public int x() {
         return x;
@@ -96,5 +102,9 @@ public enum Direction {
 
     public static Optional<Direction> byAlias(String alias) {
         return Optional.ofNullable(byAlias.getOrDefault(alias, null));
+    }
+
+    public static Optional<Direction> byVector(Vector2D vector) {
+        return Optional.ofNullable(byVector.getOrDefault(vector, null));
     }
 }
