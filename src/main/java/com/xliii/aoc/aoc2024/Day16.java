@@ -27,12 +27,15 @@ public class Day16 extends Puzzle {
     private static final char EMPTY = '.';
     private static final char START = 'S';
     private static final char END = 'E';
+    private static final char PATH = 'O';
+    private static final char CURRENT = 'X';
 
     private static final Map<Character, Color> COLOR_MAP = Map.of(
             WALL, Color.BLUE,
             START, Color.GREEN,
             END, Color.YELLOW,
-            EMPTY, Color.BLACK
+            EMPTY, Color.BLACK,
+            CURRENT, Color.RED
     );
 
     private static final ScoreCell ZERO = new ScoreCell(0);
@@ -52,7 +55,40 @@ public class Day16 extends Puzzle {
     }
 
     private void solve2() {
+        grid = Grid.create(getInput(), COLOR_MAP);
 
+        var end = grid.findOne(END).orElseThrow();
+        walkBack(end, score(end) + 1, 0);
+
+        log.info(grid);
+
+        log.info("Path: " + (grid.findAll(PATH).size() + 1)); // add START
+    }
+
+    private int score(Cell<Character> cell) {
+        return scoreMap.get(cell.pos()).value;
+    }
+
+    private boolean isPath(int current, int score, int prevScore) {
+        return (score - current == 1) || (score - current == 1001) || (prevScore - current == 2);
+    }
+
+    private void walkBack(Cell<Character> cell, int score, int prevScore) {
+        var cellValue = grid.get(cell.pos());
+        grid.put(cell.x(), cell.y(), CURRENT);
+        //log.info(grid);
+        if (!isPath(score(cell), score, prevScore)) {
+            grid.put(cell.x(), cell.y(), cellValue);
+            return;
+        }
+
+        grid.put(cell.x(), cell.y(), PATH);
+
+        for (var neighbor : grid.neighbors(cell.x(), cell.y())) {
+            if (neighbor.value() == EMPTY) {
+                walkBack(neighbor, score(cell), score);
+            }
+        }
     }
 
     private void solve1() {
@@ -84,7 +120,7 @@ public class Day16 extends Puzzle {
 
         log.info(scoreMap);
 
-        log.success(scoreMap.get(end.x(), end.y()));
+        log.success(score(end));
     }
 
     private void walk(Cell<Character> prev, Cell<Character> current, Direction direction, int score) {
@@ -97,8 +133,8 @@ public class Day16 extends Puzzle {
 
         int x = current.x();
         int y = current.y();
-        var prevScore = scoreMap.get(x, y);
-        if (prevScore.value <= score) return;
+        var prevScore = score(current);
+        if (prevScore <= score) return;
 
         scoreMap.put(x, y, new ScoreCell(score));
 
