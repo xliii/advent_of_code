@@ -39,6 +39,14 @@ public class Logger {
         log(message, indentation);
     }
 
+    public void debug(Object message) {
+        debug(message, 0);
+    }
+
+    public void debug(Object message, int indentation) {
+        log(Color.CYAN.text(message), indentation);
+    }
+
     private void log(Object message, int indentation) {
         System.out.println("  ".repeat(indentation) + message);
     }
