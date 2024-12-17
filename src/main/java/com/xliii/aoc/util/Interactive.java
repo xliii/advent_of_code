@@ -1,5 +1,7 @@
 package com.xliii.aoc.util;
 
+import com.xliii.aoc.util.log.Logger;
+
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;

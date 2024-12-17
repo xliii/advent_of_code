@@ -1,6 +1,7 @@
 package com.xliii.aoc;
 
-import com.xliii.aoc.util.Logger;
+import com.xliii.aoc.util.log.LogLevel;
+import com.xliii.aoc.util.log.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public abstract class Puzzle {
 
-    public Logger log = new Logger();
+    public Logger log = new Logger(LogLevel.INFO);
 
     public List<String> getInput() {
         try {
