@@ -34,7 +34,7 @@ public class Day18 extends Puzzle {
 
     @Override
     protected void run() {
-        solve1();
+        //solve1(bytesFallen());
         solve2();
     }
 
@@ -49,21 +49,32 @@ public class Day18 extends Puzzle {
     private Grid<Character> grid;
 
     private void solve2() {
+        var bytes = fallingBytes();
+        for (int bytesFallen = bytesFallen(); bytesFallen < bytes.size(); bytesFallen++) {
+            int distance = solve1(bytesFallen);
+            if (distance == Integer.MAX_VALUE) {
+                log.error("Blocked at " + bytesFallen + ": " + bytes.get(bytesFallen - 1));
+                return;
+            }
 
+            log.success("Path at " + bytesFallen + ": " + distance);
+        }
+
+        log.info(grid);
     }
 
-    private void solve1() {
+    private int solve1(int bytesFallen) {
         var data = new Character[size()][size()];
         grid = Grid.create(data, COLOR_MAP);
         grid.fill(EMPTY);
         var bytes = fallingBytes();
-        bytes = bytes.subList(0, bytesFallen());
+        bytes = bytes.subList(0, bytesFallen);
 
         for (var fallingByte : bytes) {
             grid.put(fallingByte.x(), fallingByte.y(), WALL);
         }
 
-        log.info(grid);
+        //log.info(grid);
 
         int endX = size() - 1;
         int endY = size() - 1;
@@ -84,10 +95,11 @@ public class Day18 extends Puzzle {
             grid.put(graphNode.getX(), graphNode.getY(), BOX);
         }
 
-        log.info(grid);
+        //log.info(grid);
 
-        log.success(startNode.getDistance());
+        //log.success(startNode.getDistance());
 
+        return startNode.getDistance();
     }
 
     private List<Vector2D> fallingBytes() {
