@@ -4,12 +4,12 @@ import com.xliii.aoc.Puzzle;
 import com.xliii.aoc.util.Color;
 import com.xliii.aoc.util.graph.Dijkstra;
 import com.xliii.aoc.util.graph.Graph;
+import com.xliii.aoc.util.graph.GraphNode;
 import com.xliii.aoc.util.grid.Grid;
 import com.xliii.aoc.util.grid.Vector2D;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 public class Day18 extends Puzzle {
 
@@ -57,7 +57,11 @@ public class Day18 extends Puzzle {
         grid = Grid.create(data, COLOR_MAP);
         grid.fill(EMPTY);
         var bytes = fallingBytes();
-        IntStream.range(0, bytesFallen()).forEach(i -> grid.put(bytes.get(i).x(), bytes.get(i).y(), WALL));
+        bytes = bytes.subList(0, bytesFallen());
+
+        for (var fallingByte : bytes) {
+            grid.put(fallingByte.x(), fallingByte.y(), WALL);
+        }
 
         log.info(grid);
 
@@ -67,14 +71,23 @@ public class Day18 extends Puzzle {
         int startX = 0;
         int startY = 0;
 
-        var graph = Graph.fromGrid(grid);
+        var graph = Graph.fromGrid(grid, cell -> cell.value().equals(EMPTY));
         var endNode = graph.findNode(endX, endY).orElseThrow();
-        System.out.println(endNode);
 
         Dijkstra.walkTo(endNode);
 
-        var startNode = graph.findNode(startX, startY).orElseThrow();
-        System.out.println(startNode.getDistance());
+        var startNode = (GraphNode) graph.findNode(startX, startY).orElseThrow();
+
+        grid.put(startNode.getX(), startNode.getY(), BOX);
+        for (var node : startNode.getShortestPath()) {
+            var graphNode = (GraphNode) node;
+            grid.put(graphNode.getX(), graphNode.getY(), BOX);
+        }
+
+        log.info(grid);
+
+        log.success(startNode.getDistance());
+
     }
 
     private List<Vector2D> fallingBytes() {

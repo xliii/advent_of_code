@@ -7,6 +7,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Stream;
 
+//TODO: Default color map
 public class Grid<T> implements Iterable<Cell<T>> {
 
     public final T[][] data;
