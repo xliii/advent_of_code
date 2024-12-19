@@ -35,6 +35,11 @@ public record Vector2D(int x, int y) {
         return false;
     }
 
+    public static Vector2D fromString(String pos) {
+        String[] parts = pos.split(",");
+        return new Vector2D(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+    }
+
     public List<Vector2D> neighbors(List<Direction> directions) {
         return directions.stream()
                 .map(this::move)
