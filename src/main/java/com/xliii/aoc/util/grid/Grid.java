@@ -67,6 +67,25 @@ public class Grid<T> implements Iterable<Cell<T>> {
         return neighbors(x, y, Direction.ORTHOGONAL);
     }
 
+    public List<Cell<T>> manhattanNeighbors(int x, int y, int distance) {
+        List<Cell<T>> neighbors = new ArrayList<>();
+        for (var cell : this) {
+            var manhattanDistance = Math.abs(cell.x() - x) + Math.abs(cell.y() - y);
+            if (cell.x() == x && cell.y() == y) {
+                //skip this
+                continue;
+            }
+
+            if (manhattanDistance > distance) {
+                continue;
+            }
+
+            neighbors.add(cell);
+        }
+
+        return neighbors;
+    }
+
     public List<Cell<T>> neighbors(int x, int y, List<Direction> directions) {
         return directions.stream()
                 .map(d -> neighborSafe(x, y, d))
