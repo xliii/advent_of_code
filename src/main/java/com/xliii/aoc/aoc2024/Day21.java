@@ -2,15 +2,12 @@ package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
 import com.xliii.aoc.util.Direction;
-import com.xliii.aoc.util.graph.Dijkstra;
-import com.xliii.aoc.util.graph.Graph;
-import com.xliii.aoc.util.graph.GraphNode;
-import com.xliii.aoc.util.graph.Node;
 import com.xliii.aoc.util.grid.Grid;
 import com.xliii.aoc.util.grid.Vector2D;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Day21 extends Puzzle {
 
@@ -46,39 +43,45 @@ public class Day21 extends Puzzle {
     private void solve2() {
     }
 
-    private record Path (String from, String to) {}
+    private record Path (Character from, Character to) {}
 
-    private String pathToSequence(Node start, List<Node> path) {
-        List<Character> sequence = new ArrayList<>();
-        path.addFirst(start);
-        for (int i = 0; i < path.size() - 1; i++) {
-            var from = (GraphNode) path.get(i);
-            var to = (GraphNode) path.get(i + 1);
+    private String keypadSequence(Vector2D from, Vector2D to) {
+        //TODO: Support multiple paths
+        StringBuilder sb = new StringBuilder();
+        var x = to.x() - from.x();
+        var y = to.y() - from.y();
 
-            var vector = new Vector2D(to.getX() - from.getX(), to.getY() - from.getY());
-            var direction = Direction.byVector(vector).orElseThrow();
-            sequence.add(direction.sign());
-        }
-        //TODO: Optimize sequences while not allowing stepping outside keypad
+        sb.append(String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)));
+        sb.append(String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))));
+        sb.append(String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))));
+        sb.append(String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)));
+        sb.append('A');
+        return sb.toString();
+    }
 
-        sequence.add('A');
-        return sequence.stream().map(String::valueOf).collect(Collectors.joining());
+    private String directionalSequence(Vector2D from, Vector2D to) {
+        StringBuilder sb = new StringBuilder();
+        var x = to.x() - from.x();
+        var y = to.y() - from.y();
+
+        sb.append(String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)));
+        sb.append(String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)));
+        sb.append(String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))));
+        sb.append(String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))));
+        sb.append('A');
+        return sb.toString();
     }
 
     private void fillKeypadMap() {
         var grid = Grid.create(List.of("789", "456", "123", " 0A"));
 
-        //TODO: calculate sequence from x/y
-        for (var cell : grid) {
-            var graph = Graph.fromGrid(grid, c -> !c.value().equals(EMPTY));
-            if (cell.value().equals(EMPTY)) continue;
-
-            var targetNode = graph.findNode(cell.x(), cell.y()).orElseThrow();
-            Dijkstra.walkTo(targetNode);
-            for (var node : graph.getNodes()) {
-                String path = pathToSequence(node, node.getShortestPath().reversed());
-                //log.info("Path from " + node.getName() + " to " + targetNode.getName() + ": " + path);
-                KEYPAD_MOVEMENTS.put(new Path(node.getName(), targetNode.getName()), path);
+        for (var from : grid) {
+            if (from.value().equals(EMPTY)) continue;
+            for (var to : grid) {
+                if (to.value().equals(EMPTY)) continue;
+                String path = keypadSequence(from.pos(), to.pos());
+                KEYPAD_MOVEMENTS.put(new Path(from.value(), to.value()), path);
+                //log.info(from.value() + " -> " + to.value() + " - " + path);
             }
         }
     }
@@ -86,16 +89,13 @@ public class Day21 extends Puzzle {
     private void fillDirectionalMap() {
         var grid = Grid.create(List.of(" ^A", "<v>"));
 
-        for (var cell : grid) {
-            var graph = Graph.fromGrid(grid, c -> !c.value().equals(EMPTY));
-            if (cell.value().equals(EMPTY)) continue;
-
-            var targetNode = graph.findNode(cell.x(), cell.y()).orElseThrow();
-            Dijkstra.walkTo(targetNode);
-            for (var node : graph.getNodes()) {
-                String path = pathToSequence(node, node.getShortestPath().reversed());
-                //log.info("Path from " + node.getName() + " to " + targetNode.getName() + ": " + path);
-                DIRECTIONAL_MOVEMENTS.put(new Path(node.getName(), targetNode.getName()), path);
+        for (var from : grid) {
+            if (from.value().equals(EMPTY)) continue;
+            for (var to : grid) {
+                if (to.value().equals(EMPTY)) continue;
+                String path = directionalSequence(from.pos(), to.pos());
+                DIRECTIONAL_MOVEMENTS.put(new Path(from.value(), to.value()), path);
+                //log.info(from.value() + " -> " + to.value() + " - " + path);
             }
         }
     }
@@ -119,13 +119,11 @@ public class Day21 extends Puzzle {
             int length = third.length();
             total += number * length;
             log.error("Complexity: " + length + " * " + number + " = " + number * length);
-
-            //TODO: 3rd & 4th are wrong
         }
 
         log.success(total);
 
-        String unwrap1 = unwrapSequence("^<<A^^A>>AvvvA", DIRECTIONAL_MOVEMENTS);
+        String unwrap1 = unwrapSequence("^A<<^^A>>AvvvA", DIRECTIONAL_MOVEMENTS);
         System.out.println(unwrap1);
         System.out.println(unwrapSequence(unwrap1, DIRECTIONAL_MOVEMENTS));
     }
@@ -134,8 +132,8 @@ public class Day21 extends Puzzle {
         sequence = "A" + sequence;
         var sb = new StringBuilder();
         for (int i = 0; i < sequence.length() - 1; i++) {
-            var from = sequence.substring(i, i + 1);
-            var to = sequence.substring(i + 1, i + 2);
+            var from = sequence.charAt(i);
+            var to = sequence.charAt(i + 1);
             String path = lookup.get(new Path(from, to));
             sb.append(path);
         }
