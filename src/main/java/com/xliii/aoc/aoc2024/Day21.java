@@ -5,9 +5,7 @@ import com.xliii.aoc.util.Direction;
 import com.xliii.aoc.util.grid.Grid;
 import com.xliii.aoc.util.grid.Vector2D;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Day21 extends Puzzle {
 
@@ -37,39 +35,53 @@ public class Day21 extends Puzzle {
         solve2();
     }
 
-    private final Map<Path, String> KEYPAD_MOVEMENTS = new HashMap<>();
-    private final Map<Path, String> DIRECTIONAL_MOVEMENTS = new HashMap<>();
+    private final Map<Path, List<String>> KEYPAD_MOVEMENTS = new HashMap<>();
+    private final Map<Path, List<String>> DIRECTIONAL_MOVEMENTS = new HashMap<>();
 
     private void solve2() {
     }
 
-    private record Path (Character from, Character to) {}
-
-    private String keypadSequence(Vector2D from, Vector2D to) {
-        //TODO: Support multiple paths
-        StringBuilder sb = new StringBuilder();
-        var x = to.x() - from.x();
-        var y = to.y() - from.y();
-
-        sb.append(String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)));
-        sb.append(String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))));
-        sb.append(String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))));
-        sb.append(String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)));
-        sb.append('A');
-        return sb.toString();
+    private record Path(Character from, Character to) {
     }
 
-    private String directionalSequence(Vector2D from, Vector2D to) {
-        StringBuilder sb = new StringBuilder();
+    private List<String> keypadSequence(Vector2D from, Vector2D to) {
+        //TODO: Find all possible paths
         var x = to.x() - from.x();
         var y = to.y() - from.y();
 
-        sb.append(String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)));
-        sb.append(String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)));
-        sb.append(String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))));
-        sb.append(String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))));
-        sb.append('A');
-        return sb.toString();
+        String horizontalFirst = String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)) +
+                String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))) +
+                String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))) +
+                String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)) +
+                'A';
+
+
+        String verticalFirst = String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))) +
+                String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)) +
+                String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)) +
+                String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))) +
+                'A';
+
+        return List.of(horizontalFirst, verticalFirst);
+    }
+
+    private List<String> directionalSequence(Vector2D from, Vector2D to) {
+        var x = to.x() - from.x();
+        var y = to.y() - from.y();
+
+        String verticalFirst = String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)) +
+                String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)) +
+                String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))) +
+                String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))) +
+                'A';
+
+        String horizontalFirst = String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)) +
+                String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)) +
+                String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))) +
+                String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))) +
+                'A';
+
+        return List.of(verticalFirst, horizontalFirst);
     }
 
     private void fillKeypadMap() {
@@ -79,8 +91,8 @@ public class Day21 extends Puzzle {
             if (from.value().equals(EMPTY)) continue;
             for (var to : grid) {
                 if (to.value().equals(EMPTY)) continue;
-                String path = keypadSequence(from.pos(), to.pos());
-                KEYPAD_MOVEMENTS.put(new Path(from.value(), to.value()), path);
+                var paths = keypadSequence(from.pos(), to.pos());
+                KEYPAD_MOVEMENTS.put(new Path(from.value(), to.value()), paths);
                 //log.info(from.value() + " -> " + to.value() + " - " + path);
             }
         }
@@ -93,8 +105,8 @@ public class Day21 extends Puzzle {
             if (from.value().equals(EMPTY)) continue;
             for (var to : grid) {
                 if (to.value().equals(EMPTY)) continue;
-                String path = directionalSequence(from.pos(), to.pos());
-                DIRECTIONAL_MOVEMENTS.put(new Path(from.value(), to.value()), path);
+                var paths = directionalSequence(from.pos(), to.pos());
+                DIRECTIONAL_MOVEMENTS.put(new Path(from.value(), to.value()), paths);
                 //log.info(from.value() + " -> " + to.value() + " - " + path);
             }
         }
@@ -108,36 +120,48 @@ public class Day21 extends Puzzle {
 
         for (var line : getInput()) {
             log.info(line);
-            var first = unwrapSequence(line, KEYPAD_MOVEMENTS);
+            var first = unwrapSequence("A" + line, KEYPAD_MOVEMENTS);
             log.error(first);
-            var second = unwrapSequence(first, DIRECTIONAL_MOVEMENTS);
+            var second = first.stream().flatMap(sequence -> unwrapSequence("A" + sequence, DIRECTIONAL_MOVEMENTS).stream()).toList();
             log.warn(second);
-            var third = unwrapSequence(second, DIRECTIONAL_MOVEMENTS);
+            var third = second.stream().flatMap(sequence -> unwrapSequence("A" + sequence, DIRECTIONAL_MOVEMENTS).stream()).toList();
             log.success(third);
 
-            int number = Integer.parseInt(line.substring(0, line.length() - 1));
-            int length = third.length();
-            total += number * length;
-            log.error("Complexity: " + length + " * " + number + " = " + number * length);
+            var shortestThird = third.stream().min(Comparator.comparingInt(String::length)).orElseThrow();
+            log.success(shortestThird);
+            log.success(shortestThird.length());
+
+
+
+//            var second = unwrapSequence(first, DIRECTIONAL_MOVEMENTS);
+//            log.warn(second);
+//            var third = unwrapSequence(second, DIRECTIONAL_MOVEMENTS);
+//            log.success(third);
+
+//            int number = Integer.parseInt(line.substring(0, line.length() - 1));
+//            int length = third.length();
+//            total += number * length;
+//            log.error("Complexity: " + length + " * " + number + " = " + number * length);
         }
 
         log.success(total);
-
-        String unwrap1 = unwrapSequence("^A<<^^A>>AvvvA", DIRECTIONAL_MOVEMENTS);
-        System.out.println(unwrap1);
-        System.out.println(unwrapSequence(unwrap1, DIRECTIONAL_MOVEMENTS));
     }
 
-    private String unwrapSequence(String sequence, Map<Path, String> lookup) {
-        sequence = "A" + sequence;
-        var sb = new StringBuilder();
-        for (int i = 0; i < sequence.length() - 1; i++) {
-            var from = sequence.charAt(i);
-            var to = sequence.charAt(i + 1);
-            String path = lookup.get(new Path(from, to));
-            sb.append(path);
+    private List<String> unwrapSequence(String sequence, Map<Path, List<String>> lookup) {
+        if (sequence.length() < 2) {
+            return List.of("", "");
         }
-        return sb.toString();
+
+        List<String> result = new ArrayList<>();
+        var from = sequence.charAt(0);
+        var to = sequence.charAt(1);
+        List<String> firstOptions = lookup.get(new Path(from, to));
+        var sequences = unwrapSequence(sequence.substring(1), lookup);
+        for (var first : firstOptions) {
+            result.addAll(sequences.stream().map(s -> first + s).toList());
+        }
+
+        return result.stream().distinct().toList();
     }
 
     public static void main(String[] ignoredArgs) {
