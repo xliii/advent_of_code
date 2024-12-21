@@ -8,7 +8,7 @@ public class GraphNode extends Node {
     private final int y;
 
     public GraphNode(Cell<Character> cell) {
-        super(cell.toString());
+        super(cell.value().toString());
         x = cell.x();
         y = cell.y();
     }
