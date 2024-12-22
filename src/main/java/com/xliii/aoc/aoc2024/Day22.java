@@ -2,6 +2,10 @@ package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 public class Day22 extends Puzzle {
 
     private static final long ITERATIONS = 2000;
@@ -13,7 +17,7 @@ public class Day22 extends Puzzle {
 
     @Override
     protected void run() {
-        solve1();
+        //solve1();
         solve2();
     }
 
@@ -42,8 +46,35 @@ public class Day22 extends Puzzle {
         return secret ^ result;
     }
 
-    private void solve2() {
+    private final Map<String, Long> SEQUENCE_PRICE_MAP = new ConcurrentHashMap<>();
 
+    private void solve2() {
+        for (var line : getInput()) {
+            List<Long> changes = new ArrayList<>();
+            long secret = Long.parseLong(line);
+            var price = secret % 10;
+            //log.error(secret + " -> " + price);
+            Set<String> used = new HashSet<>();
+            for (var i = 0; i < ITERATIONS; i++) {
+                secret = nextSecret(secret);
+                var newPrice = secret % 10;
+                var change = newPrice - price;
+                price = newPrice;
+                //log.warn(secret + " -> " + price + "(" + change + ")");
+                changes.add(change);
+                if (changes.size() >= 4) {
+                    String changeSequence = changes.subList(changes.size() - 4, changes.size()).stream().map(String::valueOf).collect(Collectors.joining());
+                    if (!used.contains(changeSequence)) {
+                        used.add(changeSequence);
+                        SEQUENCE_PRICE_MAP.merge(changeSequence, price, Long::sum);
+                    }
+                }
+            }
+        }
+
+        //log.info(SEQUENCE_PRICE_MAP);
+        Map.Entry<String, Long> max = SEQUENCE_PRICE_MAP.entrySet().stream().max(Comparator.comparingLong(Map.Entry::getValue)).orElseThrow();
+        log.success(max);
     }
 
     private void solve1() {
