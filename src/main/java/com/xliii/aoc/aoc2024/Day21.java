@@ -50,6 +50,8 @@ public class Day21 extends Puzzle {
 
     private record Path(Character from, Character to) {}
 
+    private record PathWithDepth(Character from, Character to, long depth) {}
+
     private List<String> keypadSequence(Vector2D from, Vector2D to) {
         //TODO: Find all possible paths, while eliminating invalid (outside field)
         var x = to.x() - from.x();
@@ -128,25 +130,16 @@ public class Day21 extends Puzzle {
         }
     }
 
-    private void solve(int robots) {
-        int total = 0;
+    private void solve(long robots) {
+        long total = 0;
 
         for (var line : getInput()) {
             log.info(line);
-            var first = unwrapSequence("A" + line, KEYPAD_MOVEMENTS);
-            log.error(first);
-            var next = first;
-            for (int i = 0; i < robots; i++) {
-                next = next.stream().flatMap(sequence -> unwrapSequence("A" + sequence, DIRECTIONAL_MOVEMENTS).stream()).toList();
-                log.warn(next);
-            }
-            var shortest = next.stream().min(Comparator.comparingInt(String::length)).orElseThrow();
-            log.success(shortest);
-            var length = shortest.length();
+            long cost = codeCost(line, robots);
 
-            int number = Integer.parseInt(line.substring(0, line.length() - 1));
-            total += number * length;
-            log.error("Complexity: " + length + " * " + number + " = " + number * length);
+            long number = Long.parseLong(line.substring(0, line.length() - 1));
+            total += number * cost;
+            log.error("Complexity: " + cost + " * " + number + " = " + number * cost);
         }
 
         log.success(total);
@@ -156,32 +149,52 @@ public class Day21 extends Puzzle {
         solve(2);
     }
 
-    private Map<String, List<String>> UNWRAP_CACHE = new ConcurrentHashMap<>();
+    private final Map<PathWithDepth, Long> UNWRAP_CACHE = new ConcurrentHashMap<>();
 
-    private List<String> memoizedUnwrapSequence(String sequence, Map<Path, List<String>> lookup) {
-        if (!UNWRAP_CACHE.containsKey(sequence)) {
-            UNWRAP_CACHE.put(sequence, unwrapSequence(sequence, lookup));
+    private long memoizedCost(Character from, Character to, long depth, long maxDepth) {
+        var pathWithDepth = new PathWithDepth(from, to, depth);
+        if (!UNWRAP_CACHE.containsKey(pathWithDepth)) {
+            UNWRAP_CACHE.put(pathWithDepth, cost(from, to, depth, maxDepth));
         }
 
-        return UNWRAP_CACHE.get(sequence);
+        return UNWRAP_CACHE.get(pathWithDepth);
     }
 
-    private List<String> unwrapSequence(String sequence, Map<Path, List<String>> lookup) {
-        //TODO: somehow prune tree? or calculate length without actually going through all of options
-        if (sequence.length() < 2) {
-            return List.of("", "");
+    private long codeCost(String line, long depth) {
+        line = "A" + line;
+        long cost = 0;
+        for (int i = 0; i < line.length() - 1; i++) {
+            var from = line.charAt(i);
+            var to = line.charAt(i + 1);
+            cost += cost(from, to, depth, depth);
+        }
+        return cost;
+    }
+
+    private long cost(Character from, Character to, long depth, long maxDepth) {
+        var lookup = (depth == maxDepth) ? KEYPAD_MOVEMENTS : DIRECTIONAL_MOVEMENTS;
+        if (depth == 0) {
+            return lookup.get(new Path(from, to))
+                    .stream().map(String::length)
+                    .min(Comparator.naturalOrder()).orElseThrow();
         }
 
-        List<String> result = new ArrayList<>();
-        var from = sequence.charAt(0);
-        var to = sequence.charAt(1);
-        List<String> firstOptions = lookup.get(new Path(from, to));
-        var sequences = memoizedUnwrapSequence(sequence.substring(1), lookup);
-        for (var first : firstOptions) {
-            result.addAll(sequences.stream().map(s -> first + s).toList());
+        var paths = lookup.get(new Path(from, to));
+        var smallest_cost = Long.MAX_VALUE;
+
+        for (var path : paths) {
+            path = "A" + path;
+            var cost = 0L;
+            for (int i = 0; i < path.length() - 1; i++) {
+                from = path.charAt(i);
+                to = path.charAt(i + 1);
+                cost += memoizedCost(from, to, depth - 1, maxDepth);
+            }
+
+            smallest_cost = Math.min(smallest_cost, cost);
         }
 
-        return result.stream().distinct().toList();
+        return smallest_cost;
     }
 
     public static void main(String[] ignoredArgs) {
