@@ -6,6 +6,7 @@ import com.xliii.aoc.util.grid.Grid;
 import com.xliii.aoc.util.grid.Vector2D;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Day21 extends Puzzle {
 
@@ -155,7 +156,18 @@ public class Day21 extends Puzzle {
         solve(2);
     }
 
+    private Map<String, List<String>> UNWRAP_CACHE = new ConcurrentHashMap<>();
+
+    private List<String> memoizedUnwrapSequence(String sequence, Map<Path, List<String>> lookup) {
+        if (!UNWRAP_CACHE.containsKey(sequence)) {
+            UNWRAP_CACHE.put(sequence, unwrapSequence(sequence, lookup));
+        }
+
+        return UNWRAP_CACHE.get(sequence);
+    }
+
     private List<String> unwrapSequence(String sequence, Map<Path, List<String>> lookup) {
+        //TODO: somehow prune tree? or calculate length without actually going through all of options
         if (sequence.length() < 2) {
             return List.of("", "");
         }
@@ -164,7 +176,7 @@ public class Day21 extends Puzzle {
         var from = sequence.charAt(0);
         var to = sequence.charAt(1);
         List<String> firstOptions = lookup.get(new Path(from, to));
-        var sequences = unwrapSequence(sequence.substring(1), lookup);
+        var sequences = memoizedUnwrapSequence(sequence.substring(1), lookup);
         for (var first : firstOptions) {
             result.addAll(sequences.stream().map(s -> first + s).toList());
         }
