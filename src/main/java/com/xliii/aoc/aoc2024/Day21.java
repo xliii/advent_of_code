@@ -23,15 +23,20 @@ public class Day21 extends Puzzle {
     */
 
     private static final Character EMPTY = ' ';
+    private static final Vector2D KEYPAD_EMPTY = new Vector2D(0,3);
+    private static final Vector2D DIRECTIONAL_EMPTY = new Vector2D(0, 0);
 
     @Override
     protected boolean useExample() {
-        return true;
+        return false;
     }
 
     @Override
     protected void run() {
-        solve1();
+        fillDirectionalMap();
+        fillKeypadMap();
+
+        //solve1();
         solve2();
     }
 
@@ -39,30 +44,35 @@ public class Day21 extends Puzzle {
     private final Map<Path, List<String>> DIRECTIONAL_MOVEMENTS = new HashMap<>();
 
     private void solve2() {
+        solve(25);
     }
 
-    private record Path(Character from, Character to) {
-    }
+    private record Path(Character from, Character to) {}
 
     private List<String> keypadSequence(Vector2D from, Vector2D to) {
-        //TODO: Find all possible paths
+        //TODO: Find all possible paths, while eliminating invalid (outside field)
         var x = to.x() - from.x();
         var y = to.y() - from.y();
 
         String horizontalFirst = String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)) +
-                String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))) +
                 String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))) +
+                String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))) +
                 String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)) +
                 'A';
 
 
         String verticalFirst = String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))) +
-                String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)) +
                 String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)) +
+                String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)) +
                 String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))) +
                 'A';
 
-        return List.of(horizontalFirst, verticalFirst);
+        //remove path through empty
+        if (new Vector2D(to.x(), from.y()).equals(KEYPAD_EMPTY)) {
+            return List.of(verticalFirst);
+        } else if (new Vector2D(from.x(), to.y()).equals(KEYPAD_EMPTY)) {
+            return List.of(horizontalFirst);
+        } else return List.of(horizontalFirst, verticalFirst);
     }
 
     private List<String> directionalSequence(Vector2D from, Vector2D to) {
@@ -70,18 +80,23 @@ public class Day21 extends Puzzle {
         var y = to.y() - from.y();
 
         String verticalFirst = String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)) +
-                String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)) +
                 String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))) +
+                String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)) +
                 String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))) +
                 'A';
 
         String horizontalFirst = String.valueOf(Direction.EAST.sign()).repeat(Math.max(0, x)) +
-                String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)) +
                 String.valueOf(Direction.WEST.sign()).repeat(Math.abs(Math.min(0, x))) +
+                String.valueOf(Direction.SOUTH.sign()).repeat(Math.max(0, y)) +
                 String.valueOf(Direction.NORTH.sign()).repeat(Math.abs(Math.min(0, y))) +
                 'A';
 
-        return List.of(verticalFirst, horizontalFirst);
+        //remove path through empty
+        if (new Vector2D(to.x(), from.y()).equals(DIRECTIONAL_EMPTY)) {
+            return List.of(verticalFirst);
+        } else if (new Vector2D(from.x(), to.y()).equals(DIRECTIONAL_EMPTY)) {
+            return List.of(horizontalFirst);
+        } else return List.of(horizontalFirst, verticalFirst);
     }
 
     private void fillKeypadMap() {
@@ -92,7 +107,7 @@ public class Day21 extends Puzzle {
             for (var to : grid) {
                 if (to.value().equals(EMPTY)) continue;
                 var paths = keypadSequence(from.pos(), to.pos());
-                KEYPAD_MOVEMENTS.put(new Path(from.value(), to.value()), paths);
+                KEYPAD_MOVEMENTS.put(new Path(from.value(), to.value()), paths.stream().distinct().toList());
                 //log.info(from.value() + " -> " + to.value() + " - " + path);
             }
         }
@@ -106,45 +121,38 @@ public class Day21 extends Puzzle {
             for (var to : grid) {
                 if (to.value().equals(EMPTY)) continue;
                 var paths = directionalSequence(from.pos(), to.pos());
-                DIRECTIONAL_MOVEMENTS.put(new Path(from.value(), to.value()), paths);
+                DIRECTIONAL_MOVEMENTS.put(new Path(from.value(), to.value()), paths.stream().distinct().toList());
                 //log.info(from.value() + " -> " + to.value() + " - " + path);
             }
         }
     }
 
-    private void solve1() {
-        fillDirectionalMap();
-        fillKeypadMap();
-
+    private void solve(int robots) {
         int total = 0;
 
         for (var line : getInput()) {
             log.info(line);
             var first = unwrapSequence("A" + line, KEYPAD_MOVEMENTS);
             log.error(first);
-            var second = first.stream().flatMap(sequence -> unwrapSequence("A" + sequence, DIRECTIONAL_MOVEMENTS).stream()).toList();
-            log.warn(second);
-            var third = second.stream().flatMap(sequence -> unwrapSequence("A" + sequence, DIRECTIONAL_MOVEMENTS).stream()).toList();
-            log.success(third);
+            var next = first;
+            for (int i = 0; i < robots; i++) {
+                next = next.stream().flatMap(sequence -> unwrapSequence("A" + sequence, DIRECTIONAL_MOVEMENTS).stream()).toList();
+                log.warn(next);
+            }
+            var shortest = next.stream().min(Comparator.comparingInt(String::length)).orElseThrow();
+            log.success(shortest);
+            var length = shortest.length();
 
-            var shortestThird = third.stream().min(Comparator.comparingInt(String::length)).orElseThrow();
-            log.success(shortestThird);
-            log.success(shortestThird.length());
-
-
-
-//            var second = unwrapSequence(first, DIRECTIONAL_MOVEMENTS);
-//            log.warn(second);
-//            var third = unwrapSequence(second, DIRECTIONAL_MOVEMENTS);
-//            log.success(third);
-
-//            int number = Integer.parseInt(line.substring(0, line.length() - 1));
-//            int length = third.length();
-//            total += number * length;
-//            log.error("Complexity: " + length + " * " + number + " = " + number * length);
+            int number = Integer.parseInt(line.substring(0, line.length() - 1));
+            total += number * length;
+            log.error("Complexity: " + length + " * " + number + " = " + number * length);
         }
 
         log.success(total);
+    }
+
+    private void solve1() {
+        solve(2);
     }
 
     private List<String> unwrapSequence(String sequence, Map<Path, List<String>> lookup) {
