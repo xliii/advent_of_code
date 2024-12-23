@@ -9,14 +9,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Graph {
 
-    private final Set<Node> nodes = new HashSet<>();
-
     public void addNode(Node node) {
-        nodes.add(node);
+        nodeMap.put(node.getName(), node);
     }
+
+    public final Map<String, Node> nodeMap = new HashMap<>();
 
     public static GridGraph fromGrid(Grid<Character> grid, Function<Cell<Character>, Boolean> eligibility) {
         Map<Vector2D, Node> nodeMap = new HashMap<>();
@@ -45,6 +46,11 @@ public class Graph {
     }
 
     public Set<Node> getNodes() {
-        return nodes;
+        return new HashSet<>(nodeMap.values());
+    }
+
+    @Override
+    public String toString() {
+        return nodeMap.values().stream().map(node -> "(" + node.getName() + " - " + node.getAdjacentNodes().keySet() + ")").collect(Collectors.joining());
     }
 }
