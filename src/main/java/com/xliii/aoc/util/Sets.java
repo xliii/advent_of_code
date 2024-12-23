@@ -12,6 +12,12 @@ public class Sets {
         return left.stream().filter(right::contains).collect(Collectors.toSet());
     }
 
+    public static <T> Set<T> union(Set<T> left, T right) {
+        Set<T> result = new HashSet<>(left);
+        result.add(right);
+        return result;
+    }
+
     public static <T> Set<T> union(Set<T> left, Set<T> right) {
         Set<T> result = new HashSet<>(left);
         result.addAll(right);

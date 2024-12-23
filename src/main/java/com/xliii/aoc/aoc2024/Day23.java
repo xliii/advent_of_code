@@ -1,11 +1,14 @@
 package com.xliii.aoc.aoc2024;
 
 import com.xliii.aoc.Puzzle;
+import com.xliii.aoc.util.graph.BronKerbosch;
 import com.xliii.aoc.util.graph.Graph;
 import com.xliii.aoc.util.graph.Node;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Day23 extends Puzzle {
 
@@ -16,20 +19,26 @@ public class Day23 extends Puzzle {
 
     @Override
     protected void run() {
-        solve1();
+        //solve1();
         solve2();
     }
 
     private void solve2() {
+        var graph = constructGraph();
 
+        Set<Node> maxClique = BronKerbosch.maximumClique(graph);
+
+        log.warn(maxClique);
+        var password = maxClique.stream().sorted(Comparator.comparing(Node::getName)).map(Node::toString).collect(Collectors.joining(","));
+        log.success(password);
     }
 
-    private void solve1() {
+    private Set<Set<Node>> solve1() {
         var graph = constructGraph();
 
         log.info(graph);
 
-        var threes = new HashSet<Set<Node>>();
+        Set<Set<Node>> threes = new HashSet<>();
 
         for (var first : graph.getNodes()) {
             for (var second : first.getAdjacentNodes().keySet()) {
@@ -44,7 +53,7 @@ public class Day23 extends Puzzle {
         }
 
         log.success(threes.size());
-        //log.success(threes);
+        return threes;
     }
 
     private Graph constructGraph() {
