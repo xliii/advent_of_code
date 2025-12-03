@@ -2,6 +2,12 @@ package com.xliii.aoc.aoc2025;
 
 import com.xliii.aoc.Puzzle;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public class Day3 extends Puzzle {
 
     @Override
@@ -11,23 +17,36 @@ public class Day3 extends Puzzle {
     }
 
     private void solve1() {
-        System.out.println(getInput().stream().mapToInt(this::power).sum());
+        System.out.println(getInput().stream().mapToLong(this::power).sum());
     }
 
-    private int power(String line) {
-        char max = (char) line.chars().max().orElseThrow();
-        int index = line.indexOf(max);
-        if (index == line.length() - 1) {
-            //Last, this is second digit, find max before it
-            String beforeMax = line.substring(0, index);
-            char max2 = (char) beforeMax.chars().max().orElseThrow();
-            return Integer.parseInt(max2 + "" + max);
-        } else {
-            //Find second max digit after this one
-            String afterMax = line.substring(index + 1);
-            char max2 = (char) afterMax.chars().max().orElseThrow();
-            return Integer.parseInt(max + "" + max2);
+    private Long power(String line) {
+        return power(line, 12);
+    }
+
+    private record IndexValue(int index, int value){}
+
+    private Long power(String line, int size) {
+        //Take N last digits
+        //Move digits to the left starting with the leftmost digit up to max value possible
+        List<Integer> list = line.chars().boxed().map(i -> i - 48).toList();
+        List<Integer> selected = new ArrayList<>(IntStream.range(list.size() - size, list.size()).boxed().toList());
+        int min = 0;
+        for (int i = 0; i < selected.size(); i++) {
+            Integer currentIndex = selected.get(i);
+            IndexValue candidate = new IndexValue(currentIndex, list.get(currentIndex));
+            for (int j = currentIndex - 1; j >= min; j--) {
+                Integer proposedValue = list.get(j);
+                if (proposedValue >= candidate.value && !selected.contains(j)) {
+                    candidate = new IndexValue(j, proposedValue);
+                }
+            }
+
+            min = candidate.index;
+            selected.set(i, candidate.index);
         }
+        String number = selected.stream().map(i -> String.valueOf(line.charAt(i))).collect(Collectors.joining());
+        return Long.parseLong(number);
     }
 
     private void solve2() {
