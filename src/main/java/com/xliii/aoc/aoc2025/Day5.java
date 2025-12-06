@@ -9,6 +9,7 @@ import com.xliii.aoc.util.grid.Grid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Day5 extends Puzzle {
 
@@ -40,6 +41,8 @@ public class Day5 extends Puzzle {
 
         ranges.combineRanges();
         System.out.println(ranges);
+
+        System.out.println(ranges.count());
     }
 
     record Ranges(List<Range> ranges) {
@@ -51,11 +54,36 @@ public class Day5 extends Puzzle {
                     .orElse(false);
         }
 
-        public void combineRanges() {
-            boolean updated = false;
-            do {
+        public long count() {
+            return ranges.stream().mapToLong(r -> r.to - r.from + 1).sum();
+        }
 
+        public void combineRanges() {
+            boolean updated;
+            do {
+                updated = false;
+                outer:
+                for (int i = 0; i < ranges.size(); i++) {
+                    Range range = ranges.get(i);
+                    for (int j = i + 1; j < ranges.size(); j++) {
+                        Range range2 = ranges.get(j);
+                        if (range.overlaps(range2)) {
+                            Range combined = range.combine(range2);
+                            ranges.remove(range);
+                            ranges.remove(range2);
+                            ranges.add(combined);
+                            System.out.println(range + " + " + range2 + " = " + combined);
+                            updated = true;
+                            break outer;
+                        }
+                    }
+                }
             } while (updated);
+        }
+
+        @Override
+        public String toString() {
+            return ranges.stream().map(Range::toString).collect(Collectors.joining(System.lineSeparator()));
         }
     }
 
@@ -71,11 +99,16 @@ public class Day5 extends Puzzle {
         public Range combine(Range range) {
             return new Range(Math.min(from, range.from), Math.max(to, range.to));
         }
+
+        @Override
+        public String toString() {
+            return "[" + from + "-" + to + "]";
+        }
     }
 
     @Override
     protected boolean useExample() {
-        return true;
+        return false;
     }
 
     public static void main(String[] args) {
